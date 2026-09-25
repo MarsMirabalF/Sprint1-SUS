@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "estudiantes": {
+      ".read": true,
+      ".write": true
+    },
+    "afiliados": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["cedulaIdentidad", "matricula"]
+    }
+  }
+}
