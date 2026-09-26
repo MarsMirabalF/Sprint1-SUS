@@ -1,17 +1,33 @@
 {
+  
   "rules": {
+
     "estudiantes": {
+
       ".read": true,
+
       ".write": true
+
     },
+
     "afiliados": {
+
       ".read": true,
+
       ".write": true,
+
       ".indexOn": ["cedulaIdentidad", "matricula"]
+
     },
+
     "serviciosMedicos": {
+
       ".read": true,
+
       ".write": true
+
     }
+
   }
+  
 }
