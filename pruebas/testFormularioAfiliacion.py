@@ -3,7 +3,9 @@ from unittest.mock import Mock
 
 from clienteSeguroUniversitario.interfaz.formularioAfiliacion import (
     CODIGO_AFILIACION_EXITOSA,
+    CODIGO_FORMATO_INVALIDO,
     CODIGO_MATRICULA_INEXISTENTE,
+    COLOR_BORDE_ERROR,
     COLOR_ERROR,
     COLOR_PRINCIPAL,
     formularioAfiliacion,
@@ -48,9 +50,13 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         }
         formulario.estadoMensajeVar = variableSimulada("")
         formulario.etiquetaEstado = Mock()
+        formulario.entradasFormulario = {
+            nombreCampo: Mock() for nombreCampo, _ in formulario.camposFormulario
+        }
         formulario.mensajesPorCodigo = {}
         formulario.fabricaServicio = Mock()
         formulario.servicio = None
+        formulario.habilitarPopups = False
         return formulario
 
     def test_construir_datos_envia_campos_esperados(self):
@@ -113,6 +119,39 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
             "La matrícula ingresada no existe en los registros de la universidad.",
         )
         formulario.etiquetaEstado.configure.assert_called_with(fg=COLOR_ERROR)
+
+    def test_enviar_afiliacion_valida_campos_obligatorios_antes_del_servicio(self):
+        formulario = self.crearFormularioBase()
+        formulario.variablesFormulario["correoElectronico"].set("   ")
+        servicioSimulado = Mock()
+        formulario.fabricaServicio = Mock(return_value=servicioSimulado)
+
+        formulario.enviarAfiliacion()
+
+        servicioSimulado.afiliarEstudiante.assert_not_called()
+        self.assertIn(
+            "Campos obligatorios faltantes: Correo electrónico.",
+            formulario.estadoMensajeVar.get(),
+        )
+        formulario.entradasFormulario["correoElectronico"].configure.assert_any_call(
+            highlightbackground=COLOR_BORDE_ERROR, highlightcolor=COLOR_BORDE_ERROR
+        )
+
+    def test_actualizar_estado_agrega_detalles_de_campos_invalidos(self):
+        formulario = self.crearFormularioBase()
+
+        formulario.actualizarEstadoSegunResultado(
+            {
+                "codigo": CODIGO_FORMATO_INVALIDO,
+                "mensaje": "Uno o más campos tienen un formato inválido.",
+                "camposInvalidos": ["cedulaIdentidad", "telefono"],
+            }
+        )
+
+        self.assertIn(
+            "Campos con formato inválido: Cédula de identidad, Teléfono.",
+            formulario.estadoMensajeVar.get(),
+        )
 
 
 if __name__ == "__main__":
