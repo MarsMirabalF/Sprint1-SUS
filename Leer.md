@@ -86,10 +86,21 @@ mostrar:
 | AFILIACION_EXITOSA      | True  | Se creó el registro en `afiliados` (`idAfiliado` devuelto)           |
 | ERROR_INESPERADO        | False | Cualquier excepción no controlada (ej. sin conexión)                 |
 
+## UI de afiliación (Parte 1)
+
+Al ejecutar `python principal.py` se abre el formulario Tkinter de afiliación,
+conectado al servicio `servicioAfiliacion.afiliarEstudiante(...)` para mostrar
+estados en la misma ventana.
+
+Prueba básica de la capa UI (sin Firebase real):
+
+```powershell
+python -m unittest pruebas.testFormularioAfiliacion
+```
+
 ## Pendiente
 
-- `clienteSeguroUniversitario/`: interfaz Tkinter (formulario, popups,
-  advertencias) que consumirá `servicioAfiliacion.afiliarEstudiante(...)`.
+- Parte 2 UI: popups detallados, advertencias ampliadas y mejoras finales.
 - Empaquetado a `.exe` con PyInstaller una vez cerrado el Sprint 1 (las
   credenciales se distribuirán como archivo externo, no embebidas en el
   ejecutable, por seguridad).
