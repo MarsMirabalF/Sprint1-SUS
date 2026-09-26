@@ -223,7 +223,9 @@ class formularioAfiliacion:
                 {
                     "exito": False,
                     "codigo": CODIGO_CAMPOS_INCOMPLETOS,
-                    "mensaje": self.mensajesPorCodigo[CODIGO_CAMPOS_INCOMPLETOS],
+                    "mensaje": self.mensajesPorCodigo.get(
+                        CODIGO_CAMPOS_INCOMPLETOS, "Debe completar todos los campos obligatorios."
+                    ),
                     "camposFaltantes": camposFaltantes,
                 }
             )
