@@ -1,5 +1,6 @@
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
 
+
 ESTUDIANTES_DE_PRUEBA = {
     "20231001": {
         "cedulaIdentidad": "9876543",

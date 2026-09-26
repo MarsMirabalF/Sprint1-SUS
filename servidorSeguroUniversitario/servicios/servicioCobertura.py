@@ -63,4 +63,32 @@ class servicioCobertura:
                 "mensaje": f"Ocurrió un error inesperado al obtener el catálogo: {error}",
             }
 
+    def consultarEstadoCobertura(self, idServicio):
+        try:
+            if not idServicio or not isinstance(idServicio, str) or not idServicio.strip():
+                return {
+                    "exito": False,
+                    "codigo": CODIGO_SERVICIO_NO_ESPECIFICADO,
+                    "mensaje": "Debe indicar el servicio médico a consultar.",
+                }
 
+            datos = self.referenciaServiciosMedicos.child(idServicio.strip()).get()
+            if datos is None:
+                return {
+                    "exito": False,
+                    "codigo": CODIGO_SERVICIO_INEXISTENTE,
+                    "mensaje": "El servicio médico seleccionado no existe en el catálogo.",
+                }
+
+            registro = self._mapearRegistro(idServicio.strip(), datos)
+            registro["exito"] = True
+            registro["codigo"] = CODIGO_COBERTURA_OBTENIDA
+            registro["mensaje"] = "Estado de cobertura obtenido correctamente."
+            return registro
+
+        except Exception as error:
+            return {
+                "exito": False,
+                "codigo": CODIGO_ERROR_INESPERADO,
+                "mensaje": f"Ocurrió un error inesperado al consultar la cobertura: {error}",
+            }
