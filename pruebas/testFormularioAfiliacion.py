@@ -154,6 +154,25 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
 
         self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
 
+    def test_seccion_cobertura_calcula_resumen(self):
+        from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import (
+            seccionCoberturaMedica,
+        )
+
+        seccion = seccionCoberturaMedica.__new__(seccionCoberturaMedica)
+        resultado = {
+            "servicios": [
+                {"cubierto": True},
+                {"cubierto": False},
+                {"cubierto": True},
+            ]
+        }
+
+        self.assertEqual(
+            seccion.construirResumenCobertura(resultado),
+            "2 de 3 servicios médicos cuentan con cobertura.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -203,6 +203,26 @@ class formularioAfiliacion:
         )
         botonLimpiar.grid(row=0, column=1)
 
+        botonCobertura = Button(
+            marcoBotones,
+            text="Consultar cobertura",
+            command=self.abrirCoberturaMedica,
+            bg=COLOR_FONDO,
+            fg=COLOR_PRINCIPAL,
+            activebackground=COLOR_ACENTO,
+            activeforeground=COLOR_PRINCIPAL,
+            font=("Segoe UI Semibold", 11),
+            bd=0,
+            relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        )
+        botonCobertura.grid(row=0, column=2, padx=(8, 0))
+
         self.etiquetaEstado = Label(
             marcoPrincipal,
             textvariable=self.estadoMensajeVar,
@@ -225,6 +245,11 @@ class formularioAfiliacion:
         if self.servicio is None:
             self.servicio = self.fabricaServicio()
         return self.servicio
+
+    def abrirCoberturaMedica(self):
+        from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import abrirVentanaCobertura
+
+        abrirVentanaCobertura(self.ventanaRaiz)
 
     def enviarAfiliacion(self):
         try:
