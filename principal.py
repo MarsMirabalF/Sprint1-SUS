@@ -1,13 +1,17 @@
-"""Punto de entrada de la aplicación este es el archivo que se ejecuta para
-correr todo el sistema """
+"""Punto de entrada de la aplicación."""
 
 import sys
+
+from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
 
 
 def principal():
     try:
-        print("clienteSeguroUniversitario aún no tiene una ventana principal implementada.")
-        print("El backend (servidorSeguroUniversitario) ya está listo para ser usado.")
+        from tkinter import Tk
+
+        ventanaPrincipal = Tk()
+        formularioAfiliacion(ventanaPrincipal)
+        ventanaPrincipal.mainloop()
     except Exception as error:
         print(f"Error inesperado al iniciar la aplicación: {error}", file=sys.stderr)
         sys.exit(1)
