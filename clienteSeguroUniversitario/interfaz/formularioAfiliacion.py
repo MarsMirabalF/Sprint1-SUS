@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Entry, Frame, Label, StringVar
+    from tkinter import Button, Entry, Frame, Label, StringVar, messagebox
 except ModuleNotFoundError:
     class StringVar:
         def __init__(self, value=""):
@@ -18,6 +18,15 @@ except ModuleNotFoundError:
             )
 
     Button = Entry = Frame = Label = widgetNoDisponible
+
+    class messagebox:
+        @staticmethod
+        def showinfo(*args, **kwargs):
+            raise ModuleNotFoundError(
+                "Tkinter no está disponible en este entorno. Instale Tk para mostrar mensajes."
+            )
+
+        showwarning = showerror = showinfo
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -229,6 +238,51 @@ class formularioAfiliacion:
             }
 
         self.actualizarEstadoSegunResultado(resultado)
+        self.mostrarPopupResultado(resultado)
+
+    def obtenerDetalleResultado(self, resultado):
+        codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)
+
+        if codigo == CODIGO_CAMPOS_INCOMPLETOS:
+            campos = resultado.get("camposFaltantes", [])
+            if campos:
+                etiquetas = dict(self.camposFormulario)
+                return "Campos pendientes:\n- " + "\n- ".join(
+                    etiquetas.get(campo, campo) for campo in campos
+                )
+
+        if codigo == CODIGO_FORMATO_INVALIDO:
+            campos = resultado.get("camposInvalidos", [])
+            if campos:
+                etiquetas = dict(self.camposFormulario)
+                return "Revise los siguientes campos:\n- " + "\n- ".join(
+                    etiquetas.get(campo, campo) for campo in campos
+                )
+
+        if codigo == CODIGO_AFILIACION_EXITOSA and resultado.get("idAfiliado"):
+            return f"Identificador de afiliación: {resultado['idAfiliado']}"
+
+        return ""
+
+    def mostrarPopupResultado(self, resultado):
+        codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)
+        mensaje = resultado.get("mensaje") or self.mensajesPorCodigo.get(
+            codigo, self.mensajesPorCodigo[CODIGO_ERROR_INESPERADO]
+        )
+        detalle = self.obtenerDetalleResultado(resultado)
+        texto = f"{mensaje}\n\n{detalle}" if detalle else mensaje
+
+        if codigo == CODIGO_AFILIACION_EXITOSA:
+            messagebox.showinfo("Afiliación exitosa", texto, parent=self.ventanaRaiz)
+        elif codigo in {
+            CODIGO_CAMPOS_INCOMPLETOS,
+            CODIGO_FORMATO_INVALIDO,
+            CODIGO_MATRICULA_INEXISTENTE,
+            CODIGO_SEGURO_YA_ACTIVO,
+        }:
+            messagebox.showwarning("Advertencia de afiliación", texto, parent=self.ventanaRaiz)
+        else:
+            messagebox.showerror("Error de afiliación", texto, parent=self.ventanaRaiz)
 
     def actualizarEstadoSegunResultado(self, resultado):
         codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)

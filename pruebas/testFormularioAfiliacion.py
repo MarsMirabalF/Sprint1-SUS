@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from clienteSeguroUniversitario.interfaz.formularioAfiliacion import (
     CODIGO_AFILIACION_EXITOSA,
@@ -81,7 +81,11 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         }
         formulario.fabricaServicio = Mock(return_value=servicioSimulado)
 
-        formulario.enviarAfiliacion()
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ):
+            formulario.ventanaRaiz = Mock()
+            formulario.enviarAfiliacion()
 
         servicioSimulado.afiliarEstudiante.assert_called_once_with(
             {
@@ -113,6 +117,42 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
             "La matrícula ingresada no existe en los registros de la universidad.",
         )
         formulario.etiquetaEstado.configure.assert_called_with(fg=COLOR_ERROR)
+
+    def test_popup_muestra_campos_faltantes(self):
+        formulario = self.crearFormularioBase()
+        formulario.ventanaRaiz = Mock()
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showwarning"
+        ) as mostrarAdvertencia:
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": "CAMPOS_INCOMPLETOS",
+                    "mensaje": "Debe completar todos los campos obligatorios.",
+                    "camposFaltantes": ["correoElectronico", "telefono"],
+                }
+            )
+
+        texto = mostrarAdvertencia.call_args.args[1]
+        self.assertIn("Correo electrónico", texto)
+        self.assertIn("Teléfono", texto)
+
+    def test_popup_exitoso_muestra_id_afiliacion(self):
+        formulario = self.crearFormularioBase()
+        formulario.ventanaRaiz = Mock()
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ) as mostrarInformacion:
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": CODIGO_AFILIACION_EXITOSA,
+                    "mensaje": "La afiliación se realizó con éxito.",
+                    "idAfiliado": "-ABC123",
+                }
+            )
+
+        self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
 
 
 if __name__ == "__main__":
