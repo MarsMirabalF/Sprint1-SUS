@@ -55,6 +55,12 @@ python principal.py
 python -m servidorSeguroUniversitario.baseDatos.sembrarDatosPrueba
 ```
 
+## Ejecutar pruebas unitarias del backend
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py"
+```
+
 ## Usar el servicio de afiliación desde código
 
 ```python

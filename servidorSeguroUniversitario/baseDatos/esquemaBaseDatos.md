@@ -71,6 +71,6 @@ constante `CAMPOS_OBLIGATORIOS` en `servicios/servicioAfiliacion.py`.
 
 ## 3. Reglas de índice (`database.rules.json`)
 
-Se indexa `afiliados/cedulaIdentidad` porque el servicio consulta por cédula
-para verificar si ya existe un seguro activo con esa cédula (aunque la matrícula
-sea distinta).
+Se indexan `afiliados/cedulaIdentidad` y `afiliados/matricula` porque el servicio
+consulta ambos campos para verificar que no exista un seguro activo duplicado ni
+por cédula ni por matrícula.

@@ -34,9 +34,9 @@ CODIGO_ERROR_INESPERADO = "ERROR_INESPERADO"
 
 class servicioAfiliacion:
 
-    def __init__(self):
-        self.referenciaEstudiantes = obtenerReferencia(NODO_ESTUDIANTES)
-        self.referenciaAfiliados = obtenerReferencia(NODO_AFILIADOS)
+    def __init__(self, referenciaEstudiantes=None, referenciaAfiliados=None):
+        self.referenciaEstudiantes = referenciaEstudiantes or obtenerReferencia(NODO_ESTUDIANTES)
+        self.referenciaAfiliados = referenciaAfiliados or obtenerReferencia(NODO_AFILIADOS)
 
     def validarCamposObligatorios(self, datosFormulario):
         camposFaltantes = []
@@ -65,6 +65,15 @@ class servicioAfiliacion:
             .equal_to(cedulaIdentidad)
             .get()
         )
+        if not resultados:
+            return False
+        for registro in resultados.values():
+            if registro.get("estado") == ESTADO_ACTIVO:
+                return True
+        return False
+
+    def existeSeguroActivoPorMatricula(self, matricula):
+        resultados = self.referenciaAfiliados.order_by_child("matricula").equal_to(matricula).get()
         if not resultados:
             return False
         for registro in resultados.values():
@@ -103,7 +112,9 @@ class servicioAfiliacion:
                     "mensaje": "La matrícula ingresada no existe en los registros de la universidad.",
                 }
 
-            if estudiante.get("tieneSeguroActivo") is True:
+            if estudiante.get("tieneSeguroActivo") is True or self.existeSeguroActivoPorMatricula(
+                matricula
+            ):
                 return {
                     "exito": False,
                     "codigo": CODIGO_SEGURO_YA_ACTIVO,
