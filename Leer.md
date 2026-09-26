@@ -27,8 +27,6 @@ proyecto/
 Ejecutar siempre desde la carpeta **raíz** del proyecto (donde está `principal.py`),
 para que los imports (`servidorSeguroUniversitario.xxx`) funcionen.
 
-
-
 | codigo                | exito | Cuándo ocurre                                                     |
 |------------------------|-------|----------------------------------------------------------------------|
 | CAMPOS_INCOMPLETOS      | False | Faltó algún campo obligatorio (ver `camposFaltantes`)                |
@@ -37,7 +35,6 @@ para que los imports (`servidorSeguroUniversitario.xxx`) funcionen.
 | SEGURO_YA_ACTIVO        | False | El estudiante ya tiene seguro activo (por matrícula o por cédula)    |
 | AFILIACION_EXITOSA      | True  | Se creó el registro en `afiliados` (`idAfiliado` devuelto)           |
 | ERROR_INESPERADO        | False | Cualquier excepción no controlada (ej. sin conexión)                 |
-
 
 | codigo                     | exito | Cuándo ocurre                                                |
 |-----------------------------|-------|------------------------------------------------------------------|
