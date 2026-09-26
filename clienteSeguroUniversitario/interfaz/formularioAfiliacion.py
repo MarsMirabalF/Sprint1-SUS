@@ -78,13 +78,27 @@ class formularioAfiliacion:
         self.ventanaRaiz.configure(bg=COLOR_FONDO)
         self.ventanaRaiz.minsize(860, 620)
         self.ventanaRaiz.columnconfigure(0, weight=1)
-        self.ventanaRaiz.rowconfigure(0, weight=1)
+        self.ventanaRaiz.rowconfigure(1, weight=1)
 
     def construirInterfaz(self):
+        marcoEncabezado = Frame(self.ventanaRaiz, bg=COLOR_PRINCIPAL)
+        marcoEncabezado.grid(row=0, column=0, sticky="ew")
+
+        etiquetaEncabezado = Label(
+            marcoEncabezado,
+            text="Seguro Universitario",
+            bg=COLOR_PRINCIPAL,
+            fg=COLOR_FONDO,
+            font=("Cambria", 20),
+            padx=24,
+            pady=16,
+        )
+        etiquetaEncabezado.grid(row=0, column=0, sticky="w")
+
         marcoPrincipal = Frame(
             self.ventanaRaiz,
             bg=COLOR_FONDO,
-            bd=1,
+            bd=0,
             relief="solid",
             highlightbackground=COLOR_ACENTO,
             highlightcolor=COLOR_ACENTO,
@@ -92,7 +106,7 @@ class formularioAfiliacion:
             padx=24,
             pady=24,
         )
-        marcoPrincipal.grid(row=0, column=0, sticky="nsew", padx=24, pady=24)
+        marcoPrincipal.grid(row=1, column=0, sticky="nsew", padx=24, pady=24)
         marcoPrincipal.columnconfigure(0, weight=1)
 
         etiquetaTitulo = Label(
@@ -129,7 +143,7 @@ class formularioAfiliacion:
                 fg=COLOR_PRINCIPAL,
                 font=("Segoe UI", 11),
                 relief="solid",
-                bd=1,
+                bd=0,
                 highlightbackground=COLOR_ACENTO,
                 highlightcolor=COLOR_ACENTO,
                 highlightthickness=1,
@@ -149,8 +163,11 @@ class formularioAfiliacion:
             activebackground=COLOR_SECUNDARIO,
             activeforeground=COLOR_FONDO,
             font=("Segoe UI Semibold", 11),
-            bd=1,
+            bd=0,
             relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
             padx=16,
             pady=8,
             cursor="hand2",
@@ -166,8 +183,11 @@ class formularioAfiliacion:
             activebackground=COLOR_ACENTO,
             activeforeground=COLOR_PRINCIPAL,
             font=("Segoe UI Semibold", 11),
-            bd=1,
+            bd=0,
             relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
             padx=16,
             pady=8,
             cursor="hand2",
