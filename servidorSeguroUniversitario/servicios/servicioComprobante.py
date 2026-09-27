@@ -1,36 +1,3 @@
-"""
-servicioComprobante.py
-
-HU 17 — Obtención de comprobantes médicos.
-
-Servicio de backend (sin UI) responsable de:
-    1. Determinar si el botón de descarga debe estar habilitado: el
-       estudiante debe tener al menos una consulta médica registrada con
-       fecha anterior o igual a hoy (criterio de aceptación 3).
-    2. Generar el archivo descargable (PDF) con el nombre del estudiante y
-       la fecha de la atención (criterio de aceptación 2).
-    3. Guardar ese PDF en el "perfil" del estudiante dentro de la Realtime
-       Database (nodo "comprobantesMedicos"), para que quede disponible
-       para verlo/descargarlo de nuevo desde cualquier instalación de la
-       app (no solo en la máquina donde se generó la primera vez), y para
-       que el equipo pueda verlo conectándose a la misma base de Firebase.
-
-No registra las consultas médicas en sí (eso lo carga el personal médico /
-otra HU, fuera de este alcance): este servicio solo lee el nodo
-"consultasMedicas" para validar y armar el comprobante.
-
-Nota sobre el diseño: Realtime Database no es un servicio de almacenamiento
-de archivos (no es Firebase Storage); guardar el PDF como texto base64 en un
-nodo funciona bien para un documento de texto simple como este (pocos KB),
-pero no es recomendable para archivos grandes (fotos, escaneos). Si más
-adelante se necesita adjuntar ese tipo de archivos, conviene migrar a
-Firebase Storage.
-
-Cada método público devuelve un diccionario con el resultado (éxito/código/
-mensaje/datos) para que la capa de UI decida qué mostrar (habilitar o no el
-botón, abrir el archivo generado, listar comprobantes guardados, etc.).
-"""
-
 import base64
 import os
 from datetime import datetime
