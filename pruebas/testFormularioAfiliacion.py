@@ -51,6 +51,7 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario.mensajesPorCodigo = {}
         formulario.fabricaServicio = Mock()
         formulario.servicio = None
+        formulario.habilitarPopups = True
         return formulario
 
     def test_construir_datos_envia_campos_esperados(self):
@@ -122,18 +123,19 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario = self.crearFormularioBase()
         formulario.ventanaRaiz = Mock()
 
-        with patch(
-            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showwarning"
-        ) as mostrarAdvertencia:
-            formulario.mostrarPopupResultado(
-                {
-                    "codigo": "CAMPOS_INCOMPLETOS",
-                    "mensaje": "Debe completar todos los campos obligatorios.",
-                    "camposFaltantes": ["correoElectronico", "telefono"],
-                }
-            )
+        resultado = {
+            "codigo": "CAMPOS_INCOMPLETOS",
+            "mensaje": "Debe completar todos los campos obligatorios.",
+            "camposFaltantes": ["correoElectronico", "telefono"],
+        }
+        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
 
-        texto = mostrarAdvertencia.call_args.args[1]
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showerror"
+        ) as mostrarError:
+            formulario.mostrarPopupResultado("CAMPOS_INCOMPLETOS", mensajeDetallado)
+
+        texto = mostrarError.call_args.args[1]
         self.assertIn("Correo electrónico", texto)
         self.assertIn("Teléfono", texto)
 
@@ -141,16 +143,17 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario = self.crearFormularioBase()
         formulario.ventanaRaiz = Mock()
 
+        resultado = {
+            "codigo": CODIGO_AFILIACION_EXITOSA,
+            "mensaje": "La afiliación se realizó con éxito.",
+            "idAfiliado": "-ABC123",
+        }
+        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
+
         with patch(
             "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
         ) as mostrarInformacion:
-            formulario.mostrarPopupResultado(
-                {
-                    "codigo": CODIGO_AFILIACION_EXITOSA,
-                    "mensaje": "La afiliación se realizó con éxito.",
-                    "idAfiliado": "-ABC123",
-                }
-            )
+            formulario.mostrarPopupResultado(CODIGO_AFILIACION_EXITOSA, mensajeDetallado)
 
         self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
 

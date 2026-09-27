@@ -295,7 +295,6 @@ class formularioAfiliacion:
             }
 
         self.actualizarEstadoSegunResultado(resultado)
-        self.mostrarPopupResultado(resultado)
 
     def obtenerDetalleResultado(self, resultado):
         codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)
