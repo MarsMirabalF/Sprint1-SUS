@@ -1,6 +1,5 @@
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
 
-
 ESTUDIANTES_DE_PRUEBA = {
     "20231001": {
         "cedulaIdentidad": "9876543",
@@ -21,8 +20,7 @@ ESTUDIANTES_DE_PRUEBA = {
         "tieneSeguroActivo": False,
     },
 }
-
-
+ 
 AFILIADOS_DE_PRUEBA = [
     {
         "matricula": "20231002",
@@ -49,8 +47,8 @@ AFILIADOS_DE_PRUEBA = [
         "estado": "inactivo",
     },
 ]
-
-
+ 
+ 
 SERVICIOS_MEDICOS_DE_PRUEBA = {
     "consultaMedicaGeneral": {
         "nombreServicio": "Consulta médica general",
@@ -95,32 +93,77 @@ SERVICIOS_MEDICOS_DE_PRUEBA = {
         "cubierto": False,
     },
 }
-
-
+ 
+ 
+CONSULTAS_MEDICAS_DE_PRUEBA = [
+    {
+        "matricula": "20231001",
+        "cedulaIdentidad": "9876543",
+        "nombreCompleto": "Maria Fernanda Rojas",
+        "idServicioMedico": "consultaMedicaGeneral",
+        "nombreServicio": "Consulta médica general",
+        "fechaConsulta": "2026-08-10",
+        "horaConsulta": "09:30",
+        "medicoTratante": "Dr. Carlos Fernandez",
+        "observaciones": "Control rutinario.",
+    },
+    {
+        "matricula": "20231001",
+        "cedulaIdentidad": "9876543",
+        "nombreCompleto": "Maria Fernanda Rojas",
+        "idServicioMedico": "laboratorioClinico",
+        "nombreServicio": "Exámenes de laboratorio",
+        "fechaConsulta": "2026-09-15",
+        "horaConsulta": "11:00",
+        "medicoTratante": "Dra. Lucia Perez",
+        "observaciones": "Examenes de rutina, resultados normales.",
+    },
+    {
+        "matricula": "20231002",
+        "cedulaIdentidad": "1122334",
+        "nombreCompleto": "Juan Pablo Quispe",
+        "idServicioMedico": "consultaMedicaGeneral",
+        "nombreServicio": "Consulta médica general",
+        "fechaConsulta": "2026-12-01",
+        "horaConsulta": "10:00",
+        "medicoTratante": "Dr. Carlos Fernandez",
+        "observaciones": "Consulta programada (fecha futura), a propósito para pruebas.",
+    },
+]
+ 
+ 
 def sembrarEstudiantesDePrueba():
     referenciaEstudiantes = obtenerReferencia("estudiantes")
     referenciaEstudiantes.update(ESTUDIANTES_DE_PRUEBA)
     print("Datos de prueba insertados en el nodo 'estudiantes'.")
-
-
+ 
+ 
 def sembrarAfiliadosDePrueba():
     referenciaAfiliados = obtenerReferencia("afiliados")
     for afiliado in AFILIADOS_DE_PRUEBA:
         referenciaAfiliados.push(afiliado)
     print("Datos de prueba insertados en el nodo 'afiliados'.")
-
-
+ 
+ 
 def sembrarServiciosMedicosDePrueba():
     referenciaServiciosMedicos = obtenerReferencia("serviciosMedicos")
     referenciaServiciosMedicos.update(SERVICIOS_MEDICOS_DE_PRUEBA)
     print("Datos de prueba insertados en el nodo 'serviciosMedicos'.")
-
-
+ 
+ 
+def sembrarConsultasMedicasDePrueba():
+    referenciaConsultasMedicas = obtenerReferencia("consultasMedicas")
+    for consulta in CONSULTAS_MEDICAS_DE_PRUEBA:
+        referenciaConsultasMedicas.push(consulta)
+    print("Datos de prueba insertados en el nodo 'consultasMedicas'.")
+ 
+ 
 def sembrarDatosDePrueba():
     sembrarEstudiantesDePrueba()
     sembrarAfiliadosDePrueba()
     sembrarServiciosMedicosDePrueba()
-
-
+    sembrarConsultasMedicasDePrueba()
+ 
+ 
 if __name__ == "__main__":
     sembrarDatosDePrueba()

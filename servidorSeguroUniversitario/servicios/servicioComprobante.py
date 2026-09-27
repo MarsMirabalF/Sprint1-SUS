@@ -50,6 +50,11 @@ CARPETA_COMPROBANTES_POR_DEFECTO = os.path.join(
     "comprobantesGenerados",
 )
 
+CARPETA_RECURSOS = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "recursos"
+)
+RUTA_FIRMA_DIGITAL = os.path.join(CARPETA_RECURSOS, "firmaDigital.jpg")
+
 CODIGO_MATRICULA_INEXISTENTE = "MATRICULA_INEXISTENTE"
 CODIGO_SIN_CONSULTA_PREVIA = "SIN_CONSULTA_PREVIA"
 CODIGO_CONSULTA_PREVIA_ENCONTRADA = "CONSULTA_PREVIA_ENCONTRADA"
@@ -384,6 +389,28 @@ class servicioComprobante:
             pdf.cell(0, 9, str(valor), ln=True)
 
         pdf.ln(10)
+        pdf.set_font("Helvetica", "", 9)
+        pdf.cell(0, 5, "Este comprobante es válido solo si incluye la firma digital autorizada.", ln=True)
+        pdf.ln(6)
+
+        if os.path.exists(RUTA_FIRMA_DIGITAL):
+            anchoFirma = 55
+            altoFirma = 25  # proporcional a la imagen de firma (1200x550 px aprox.)
+            yFirma = pdf.get_y()
+            pdf.image(RUTA_FIRMA_DIGITAL, x=20, y=yFirma, w=anchoFirma, h=altoFirma)
+            pdf.set_y(yFirma + altoFirma + 2)
+            pdf.set_font("Helvetica", "", 9)
+            pdf.cell(anchoFirma + 10, 5, "_" * 32, ln=True)
+            pdf.cell(anchoFirma + 10, 5, "Firma digital autorizada", ln=True)
+            pdf.cell(anchoFirma + 10, 5, "Seguro Social Universitario", ln=True)
+        else:
+            # No debería pasar en un entorno correctamente configurado, pero
+            # se deja constancia en el propio PDF en vez de fallar la
+            # generación completa del comprobante.
+            pdf.set_font("Helvetica", "I", 9)
+            pdf.cell(0, 5, "[Firma digital no disponible]", ln=True)
+
+        pdf.ln(8)
         pdf.set_font("Helvetica", "I", 9)
         fechaGeneracion = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         pdf.cell(0, 6, f"Comprobante generado el {fechaGeneracion}.", ln=True)
