@@ -35,7 +35,8 @@ para que los imports (`servidorSeguroUniversitario.xxx`) funcionen.
 | SEGURO_YA_ACTIVO        | False | El estudiante ya tiene seguro activo (por matrícula o por cédula)    |
 | AFILIACION_EXITOSA      | True  | Se creó el registro en `afiliados` (`idAfiliado` devuelto)           |
 | ERROR_INESPERADO        | False | Cualquier excepción no controlada (ej. sin conexión)                 |
-
+ 
+ 
 | codigo                     | exito | Cuándo ocurre                                                |
 |-----------------------------|-------|------------------------------------------------------------------|
 | LISTA_OBTENIDA               | True  | Se devolvió la lista de servicios médicos                        |
@@ -44,3 +45,26 @@ para que los imports (`servidorSeguroUniversitario.xxx`) funcionen.
 | SERVICIO_INEXISTENTE         | False | El `idServicio` consultado no existe en el catálogo              |
 | COBERTURA_OBTENIDA           | True  | Se devolvió el estado de cobertura del servicio seleccionado     |
 | ERROR_INESPERADO             | False | Cualquier excepción no controlada (ej. sin conexión)             |
+ 
+
+El PDF se guarda en la carpeta `comprobantesGenerados/` en la raíz del
+proyecto (se crea automáticamente si no existe) **y además** queda guardado
+en la DB. La futura UI puede tomar `resultado["rutaArchivo"]` para abrirlo
+apenas se genera, y usar `listarComprobantesDelEstudiante` /
+`descargarComprobanteGuardado` para la pantalla del perfil del estudiante.
+ 
+| codigo                        | exito | Cuándo ocurre                                                          |
+|---------------------------------|-------|------------------------------------------------------------------------|
+| MATRICULA_INEXISTENTE            | False | La matrícula no existe en el nodo `estudiantes`                        |
+| SIN_CONSULTA_PREVIA               | True  | El estudiante existe pero no tiene consultas con fecha ≤ hoy (botón deshabilitado, no es un error) |
+| CONSULTA_PREVIA_ENCONTRADA        | True  | Sí tiene al menos una consulta previa (botón habilitado)                |
+| CONSULTA_NO_VALIDA                | False | El `idConsulta` indicado no existe, no es previa a hoy, o es de otro estudiante |
+| COMPROBANTE_GENERADO              | True  | Se generó el PDF y se guardó en el perfil (`rutaArchivo` devuelto)      |
+| COMPROBANTE_NO_ENCONTRADO         | False | No existe un comprobante guardado con ese `idConsulta`                  |
+| ERROR_INESPERADO                  | False | Cualquier excepción no controlada (ej. sin conexión)                    |
+ 
+> Nota: `SIN_CONSULTA_PREVIA` devuelve `"exito": True` porque **no es un
+> error** — es una respuesta válida que simplemente dice "botón
+> deshabilitado". La UI debe fijarse en `resultado["habilitado"]`, no solo
+> en `resultado["exito"]`, para decidir si mostrar el botón activo o no.
+ 
