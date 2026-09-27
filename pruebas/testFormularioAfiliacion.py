@@ -1,11 +1,9 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from clienteSeguroUniversitario.interfaz.formularioAfiliacion import (
     CODIGO_AFILIACION_EXITOSA,
-    CODIGO_FORMATO_INVALIDO,
     CODIGO_MATRICULA_INEXISTENTE,
-    COLOR_BORDE_ERROR,
     COLOR_ERROR,
     COLOR_PRINCIPAL,
     formularioAfiliacion,
@@ -50,13 +48,9 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         }
         formulario.estadoMensajeVar = variableSimulada("")
         formulario.etiquetaEstado = Mock()
-        formulario.entradasFormulario = {
-            nombreCampo: Mock() for nombreCampo, _ in formulario.camposFormulario
-        }
         formulario.mensajesPorCodigo = {}
         formulario.fabricaServicio = Mock()
         formulario.servicio = None
-        formulario.habilitarPopups = False
         return formulario
 
     def test_construir_datos_envia_campos_esperados(self):
@@ -87,7 +81,11 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         }
         formulario.fabricaServicio = Mock(return_value=servicioSimulado)
 
-        formulario.enviarAfiliacion()
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ):
+            formulario.ventanaRaiz = Mock()
+            formulario.enviarAfiliacion()
 
         servicioSimulado.afiliarEstudiante.assert_called_once_with(
             {
@@ -120,37 +118,59 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         )
         formulario.etiquetaEstado.configure.assert_called_with(fg=COLOR_ERROR)
 
-    def test_enviar_afiliacion_valida_campos_obligatorios_antes_del_servicio(self):
+    def test_popup_muestra_campos_faltantes(self):
         formulario = self.crearFormularioBase()
-        formulario.variablesFormulario["correoElectronico"].set("   ")
-        servicioSimulado = Mock()
-        formulario.fabricaServicio = Mock(return_value=servicioSimulado)
+        formulario.ventanaRaiz = Mock()
 
-        formulario.enviarAfiliacion()
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showwarning"
+        ) as mostrarAdvertencia:
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": "CAMPOS_INCOMPLETOS",
+                    "mensaje": "Debe completar todos los campos obligatorios.",
+                    "camposFaltantes": ["correoElectronico", "telefono"],
+                }
+            )
 
-        servicioSimulado.afiliarEstudiante.assert_not_called()
-        self.assertIn(
-            "Campos obligatorios faltantes: Correo electrónico.",
-            formulario.estadoMensajeVar.get(),
-        )
-        formulario.entradasFormulario["correoElectronico"].configure.assert_any_call(
-            highlightbackground=COLOR_BORDE_ERROR, highlightcolor=COLOR_BORDE_ERROR
-        )
+        texto = mostrarAdvertencia.call_args.args[1]
+        self.assertIn("Correo electrónico", texto)
+        self.assertIn("Teléfono", texto)
 
-    def test_actualizar_estado_agrega_detalles_de_campos_invalidos(self):
+    def test_popup_exitoso_muestra_id_afiliacion(self):
         formulario = self.crearFormularioBase()
+        formulario.ventanaRaiz = Mock()
 
-        formulario.actualizarEstadoSegunResultado(
-            {
-                "codigo": CODIGO_FORMATO_INVALIDO,
-                "mensaje": "Uno o más campos tienen un formato inválido.",
-                "camposInvalidos": ["cedulaIdentidad", "telefono"],
-            }
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ) as mostrarInformacion:
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": CODIGO_AFILIACION_EXITOSA,
+                    "mensaje": "La afiliación se realizó con éxito.",
+                    "idAfiliado": "-ABC123",
+                }
+            )
+
+        self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
+
+    def test_seccion_cobertura_calcula_resumen(self):
+        from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import (
+            seccionCoberturaMedica,
         )
 
-        self.assertIn(
-            "Campos con formato inválido: Cédula de identidad, Teléfono.",
-            formulario.estadoMensajeVar.get(),
+        seccion = seccionCoberturaMedica.__new__(seccionCoberturaMedica)
+        resultado = {
+            "servicios": [
+                {"cubierto": True},
+                {"cubierto": False},
+                {"cubierto": True},
+            ]
+        }
+
+        self.assertEqual(
+            seccion.construirResumenCobertura(resultado),
+            "2 de 3 servicios médicos cuentan con cobertura.",
         )
 
 

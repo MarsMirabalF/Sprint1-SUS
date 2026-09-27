@@ -32,6 +32,15 @@ except ModuleNotFoundError:
 
     Button = Entry = Frame = Label = widgetNoDisponible
 
+    class messagebox:
+        @staticmethod
+        def showinfo(*args, **kwargs):
+            raise ModuleNotFoundError(
+                "Tkinter no está disponible en este entorno. Instale Tk para mostrar mensajes."
+            )
+
+        showwarning = showerror = showinfo
+
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
 COLOR_SECUNDARIO = "#6B7C6E"
@@ -95,13 +104,27 @@ class formularioAfiliacion:
         self.ventanaRaiz.configure(bg=COLOR_FONDO)
         self.ventanaRaiz.minsize(860, 620)
         self.ventanaRaiz.columnconfigure(0, weight=1)
-        self.ventanaRaiz.rowconfigure(0, weight=1)
+        self.ventanaRaiz.rowconfigure(1, weight=1)
 
     def construirInterfaz(self):
+        marcoEncabezado = Frame(self.ventanaRaiz, bg=COLOR_PRINCIPAL)
+        marcoEncabezado.grid(row=0, column=0, sticky="ew")
+
+        etiquetaEncabezado = Label(
+            marcoEncabezado,
+            text="Seguro Universitario",
+            bg=COLOR_PRINCIPAL,
+            fg=COLOR_FONDO,
+            font=("Cambria", 20),
+            padx=24,
+            pady=16,
+        )
+        etiquetaEncabezado.grid(row=0, column=0, sticky="w")
+
         marcoPrincipal = Frame(
             self.ventanaRaiz,
             bg=COLOR_FONDO,
-            bd=1,
+            bd=0,
             relief="solid",
             highlightbackground=COLOR_ACENTO,
             highlightcolor=COLOR_ACENTO,
@@ -109,7 +132,7 @@ class formularioAfiliacion:
             padx=24,
             pady=24,
         )
-        marcoPrincipal.grid(row=0, column=0, sticky="nsew", padx=24, pady=24)
+        marcoPrincipal.grid(row=1, column=0, sticky="nsew", padx=24, pady=24)
         marcoPrincipal.columnconfigure(0, weight=1)
 
         etiquetaTitulo = Label(
@@ -146,7 +169,7 @@ class formularioAfiliacion:
                 fg=COLOR_PRINCIPAL,
                 font=("Segoe UI", 11),
                 relief="solid",
-                bd=1,
+                bd=0,
                 highlightbackground=COLOR_ACENTO,
                 highlightcolor=COLOR_ACENTO,
                 highlightthickness=1,
@@ -167,8 +190,11 @@ class formularioAfiliacion:
             activebackground=COLOR_SECUNDARIO,
             activeforeground=COLOR_FONDO,
             font=("Segoe UI Semibold", 11),
-            bd=1,
+            bd=0,
             relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
             padx=16,
             pady=8,
             cursor="hand2",
@@ -184,13 +210,36 @@ class formularioAfiliacion:
             activebackground=COLOR_ACENTO,
             activeforeground=COLOR_PRINCIPAL,
             font=("Segoe UI Semibold", 11),
-            bd=1,
+            bd=0,
             relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
             padx=16,
             pady=8,
             cursor="hand2",
         )
         botonLimpiar.grid(row=0, column=1)
+
+        botonCobertura = Button(
+            marcoBotones,
+            text="Consultar cobertura",
+            command=self.abrirCoberturaMedica,
+            bg=COLOR_FONDO,
+            fg=COLOR_PRINCIPAL,
+            activebackground=COLOR_ACENTO,
+            activeforeground=COLOR_PRINCIPAL,
+            font=("Segoe UI Semibold", 11),
+            bd=0,
+            relief="solid",
+            highlightbackground=COLOR_ACENTO,
+            highlightcolor=COLOR_ACENTO,
+            highlightthickness=1,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        )
+        botonCobertura.grid(row=0, column=2, padx=(8, 0))
 
         self.etiquetaEstado = Label(
             marcoPrincipal,
@@ -214,6 +263,11 @@ class formularioAfiliacion:
         if self.servicio is None:
             self.servicio = self.fabricaServicio()
         return self.servicio
+
+    def abrirCoberturaMedica(self):
+        from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import abrirVentanaCobertura
+
+        abrirVentanaCobertura(self.ventanaRaiz)
 
     def enviarAfiliacion(self):
         datosFormulario = self.construirDatosAfiliacion()
@@ -241,6 +295,51 @@ class formularioAfiliacion:
             }
 
         self.actualizarEstadoSegunResultado(resultado)
+        self.mostrarPopupResultado(resultado)
+
+    def obtenerDetalleResultado(self, resultado):
+        codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)
+
+        if codigo == CODIGO_CAMPOS_INCOMPLETOS:
+            campos = resultado.get("camposFaltantes", [])
+            if campos:
+                etiquetas = dict(self.camposFormulario)
+                return "Campos pendientes:\n- " + "\n- ".join(
+                    etiquetas.get(campo, campo) for campo in campos
+                )
+
+        if codigo == CODIGO_FORMATO_INVALIDO:
+            campos = resultado.get("camposInvalidos", [])
+            if campos:
+                etiquetas = dict(self.camposFormulario)
+                return "Revise los siguientes campos:\n- " + "\n- ".join(
+                    etiquetas.get(campo, campo) for campo in campos
+                )
+
+        if codigo == CODIGO_AFILIACION_EXITOSA and resultado.get("idAfiliado"):
+            return f"Identificador de afiliación: {resultado['idAfiliado']}"
+
+        return ""
+
+    def mostrarPopupResultado(self, resultado):
+        codigo = resultado.get("codigo", CODIGO_ERROR_INESPERADO)
+        mensaje = resultado.get("mensaje") or self.mensajesPorCodigo.get(
+            codigo, self.mensajesPorCodigo[CODIGO_ERROR_INESPERADO]
+        )
+        detalle = self.obtenerDetalleResultado(resultado)
+        texto = f"{mensaje}\n\n{detalle}" if detalle else mensaje
+
+        if codigo == CODIGO_AFILIACION_EXITOSA:
+            messagebox.showinfo("Afiliación exitosa", texto, parent=self.ventanaRaiz)
+        elif codigo in {
+            CODIGO_CAMPOS_INCOMPLETOS,
+            CODIGO_FORMATO_INVALIDO,
+            CODIGO_MATRICULA_INEXISTENTE,
+            CODIGO_SEGURO_YA_ACTIVO,
+        }:
+            messagebox.showwarning("Advertencia de afiliación", texto, parent=self.ventanaRaiz)
+        else:
+            messagebox.showerror("Error de afiliación", texto, parent=self.ventanaRaiz)
 
     def obtenerCamposFaltantes(self, datosFormulario):
         camposFaltantes = []

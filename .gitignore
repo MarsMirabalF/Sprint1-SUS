@@ -2,7 +2,10 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-servidorSeguroUniversitario/credenciales/*.json
+# Credenciales privadas de Firebase y otras claves locales
+servidorSeguroUniversitario/credenciales/
+servidorSeguroUniversitario/credenciales/*.pem
+servidorSeguroUniversitario/credenciales/*.key
 .env
 build/
 dist/
