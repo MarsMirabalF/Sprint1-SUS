@@ -13,13 +13,17 @@ proyecto/
 │   │   └── validadores.py              -> validación de formato (cédula, correo, teléfono)
 │   ├── servicios/
 │   │   ├── servicioAfiliacion.py       -> lógica de la HU 6 (afiliación al seguro)
-│   │   └── servicioCobertura.py        -> lógica de la HU 1 (consulta de cobertura)
+│   │   ├── servicioCobertura.py        -> lógica de la HU 1 (consulta de cobertura)
+│   │   └── servicioComprobante.py      -> lógica de la HU 17 (comprobantes médicos)
 │   ├── baseDatos/
-│   │   ├── esquemaBaseDatos.md         -> diseño de nodos "estudiantes" / "afiliados" / "serviciosMedicos"
+│   │   ├── esquemaBaseDatos.md         -> diseño de todos los nodos de la DB
 │   │   ├── database.rules.json         -> reglas / índices de la Realtime Database
 │   │   └── sembrarDatosPrueba.py       -> (opcional) datos de ejemplo para probar
+│   ├── recursos/
+│   │   └── firmaDigital.jpg            -> imagen de firma (simulación) embebida en el PDF
 │   ├── credenciales/                   -> aquí va el JSON de la cuenta de servicio (NO se sube a Git)
 │   └── requirements.txt
+├── comprobantesGenerados/              -> PDFs generados por la HU 17 (no se suben a Git)
 ├── leer.md
 └── .gitignore
 ```
@@ -62,7 +66,7 @@ apenas se genera, y usar `listarComprobantesDelEstudiante` /
 | COMPROBANTE_GENERADO              | True  | Se generó el PDF y se guardó en el perfil (`rutaArchivo` devuelto)      |
 | COMPROBANTE_NO_ENCONTRADO         | False | No existe un comprobante guardado con ese `idConsulta`                  |
 | ERROR_INESPERADO                  | False | Cualquier excepción no controlada (ej. sin conexión)                    |
- 
+
 > Nota: `SIN_CONSULTA_PREVIA` devuelve `"exito": True` porque **no es un
 > error** — es una respuesta válida que simplemente dice "botón
 > deshabilitado". La UI debe fijarse en `resultado["habilitado"]`, no solo
