@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from clienteSeguroUniversitario.interfaz.formularioAfiliacion import (
     CODIGO_AFILIACION_EXITOSA,
@@ -51,6 +51,7 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario.mensajesPorCodigo = {}
         formulario.fabricaServicio = Mock()
         formulario.servicio = None
+        formulario.habilitarPopups = True
         return formulario
 
     def test_construir_datos_envia_campos_esperados(self):
@@ -81,7 +82,11 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         }
         formulario.fabricaServicio = Mock(return_value=servicioSimulado)
 
-        formulario.enviarAfiliacion()
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ):
+            formulario.ventanaRaiz = Mock()
+            formulario.enviarAfiliacion()
 
         servicioSimulado.afiliarEstudiante.assert_called_once_with(
             {
@@ -113,6 +118,63 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
             "La matrícula ingresada no existe en los registros de la universidad.",
         )
         formulario.etiquetaEstado.configure.assert_called_with(fg=COLOR_ERROR)
+
+    def test_popup_muestra_campos_faltantes(self):
+        formulario = self.crearFormularioBase()
+        formulario.ventanaRaiz = Mock()
+
+        resultado = {
+            "codigo": "CAMPOS_INCOMPLETOS",
+            "mensaje": "Debe completar todos los campos obligatorios.",
+            "camposFaltantes": ["correoElectronico", "telefono"],
+        }
+        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showerror"
+        ) as mostrarError:
+            formulario.mostrarPopupResultado("CAMPOS_INCOMPLETOS", mensajeDetallado)
+
+        texto = mostrarError.call_args.args[1]
+        self.assertIn("Correo electrónico", texto)
+        self.assertIn("Teléfono", texto)
+
+    def test_popup_exitoso_muestra_id_afiliacion(self):
+        formulario = self.crearFormularioBase()
+        formulario.ventanaRaiz = Mock()
+
+        resultado = {
+            "codigo": CODIGO_AFILIACION_EXITOSA,
+            "mensaje": "La afiliación se realizó con éxito.",
+            "idAfiliado": "-ABC123",
+        }
+        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
+        ) as mostrarInformacion:
+            formulario.mostrarPopupResultado(CODIGO_AFILIACION_EXITOSA, mensajeDetallado)
+
+        self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
+
+    def test_seccion_cobertura_calcula_resumen(self):
+        from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import (
+            seccionCoberturaMedica,
+        )
+
+        seccion = seccionCoberturaMedica.__new__(seccionCoberturaMedica)
+        resultado = {
+            "servicios": [
+                {"cubierto": True},
+                {"cubierto": False},
+                {"cubierto": True},
+            ]
+        }
+
+        self.assertEqual(
+            seccion.construirResumenCobertura(resultado),
+            "2 de 3 servicios médicos cuentan con cobertura.",
+        )
 
 
 if __name__ == "__main__":
