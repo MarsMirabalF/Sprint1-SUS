@@ -7,3 +7,4 @@ servidorSeguroUniversitario/credenciales/*.json
 build/
 dist/
 *.spec
+comprobantesGenerados/*.pdf
