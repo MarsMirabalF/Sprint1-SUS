@@ -51,7 +51,6 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario.mensajesPorCodigo = {}
         formulario.fabricaServicio = Mock()
         formulario.servicio = None
-        formulario.habilitarPopups = True
         return formulario
 
     def test_construir_datos_envia_campos_esperados(self):
@@ -123,19 +122,18 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario = self.crearFormularioBase()
         formulario.ventanaRaiz = Mock()
 
-        resultado = {
-            "codigo": "CAMPOS_INCOMPLETOS",
-            "mensaje": "Debe completar todos los campos obligatorios.",
-            "camposFaltantes": ["correoElectronico", "telefono"],
-        }
-        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
-
         with patch(
-            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showerror"
-        ) as mostrarError:
-            formulario.mostrarPopupResultado("CAMPOS_INCOMPLETOS", mensajeDetallado)
+            "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showwarning"
+        ) as mostrarAdvertencia:
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": "CAMPOS_INCOMPLETOS",
+                    "mensaje": "Debe completar todos los campos obligatorios.",
+                    "camposFaltantes": ["correoElectronico", "telefono"],
+                }
+            )
 
-        texto = mostrarError.call_args.args[1]
+        texto = mostrarAdvertencia.call_args.args[1]
         self.assertIn("Correo electrónico", texto)
         self.assertIn("Teléfono", texto)
 
@@ -143,17 +141,16 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         formulario = self.crearFormularioBase()
         formulario.ventanaRaiz = Mock()
 
-        resultado = {
-            "codigo": CODIGO_AFILIACION_EXITOSA,
-            "mensaje": "La afiliación se realizó con éxito.",
-            "idAfiliado": "-ABC123",
-        }
-        mensajeDetallado = formulario.construirMensajeDetallado(resultado)
-
         with patch(
             "clienteSeguroUniversitario.interfaz.formularioAfiliacion.messagebox.showinfo"
         ) as mostrarInformacion:
-            formulario.mostrarPopupResultado(CODIGO_AFILIACION_EXITOSA, mensajeDetallado)
+            formulario.mostrarPopupResultado(
+                {
+                    "codigo": CODIGO_AFILIACION_EXITOSA,
+                    "mensaje": "La afiliación se realizó con éxito.",
+                    "idAfiliado": "-ABC123",
+                }
+            )
 
         self.assertIn("-ABC123", mostrarInformacion.call_args.args[1])
 
@@ -175,6 +172,23 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
             seccion.construirResumenCobertura(resultado),
             "2 de 3 servicios médicos cuentan con cobertura.",
         )
+
+    def test_vista_atenciones_conserva_descarga_deshabilitada_sin_consulta_previa(self):
+        from clienteSeguroUniversitario.interfaz.vistaAtencionesMedicas import (
+            vistaAtencionesMedicas,
+        )
+
+        vista = vistaAtencionesMedicas.__new__(vistaAtencionesMedicas)
+        vista.consultas = [{"idConsulta": "consulta-futura"}]
+        vista.consultaSeleccionada = None
+        vista.descargaHabilitada = False
+        vista.botonDescargar = Mock()
+        vista.tablaAtenciones = Mock()
+        vista.tablaAtenciones.selection.return_value = ("consulta-futura",)
+
+        vista.seleccionarAtencion()
+
+        vista.botonDescargar.configure.assert_called_once_with(state="disabled")
 
 
 if __name__ == "__main__":
