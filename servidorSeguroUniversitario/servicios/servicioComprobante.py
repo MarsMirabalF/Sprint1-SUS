@@ -45,12 +45,12 @@ class servicioComprobante:
     # ------------------------------------------------------------------
     def _obtenerConsultasDelEstudiante(self, matricula):
         """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
-        resultados = (
-            self.referenciaConsultasMedicas.order_by_child("matricula")
-            .equal_to(matricula)
-            .get()
-        )
-        return resultados or {}
+        resultados = self.referenciaConsultasMedicas.get() or {}
+        return {
+            idConsulta: datos
+            for idConsulta, datos in resultados.items()
+            if isinstance(datos, dict) and str(datos.get("matricula", "")).strip() == matricula
+        }
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
         """
@@ -234,12 +234,12 @@ class servicioComprobante:
                     "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = (
-                self.referenciaComprobantesMedicos.order_by_child("matricula")
-                .equal_to(matricula)
-                .get()
-                or {}
-            )
+            resultados = self.referenciaComprobantesMedicos.get() or {}
+            resultados = {
+                idConsulta: datos
+                for idConsulta, datos in resultados.items()
+                if isinstance(datos, dict) and str(datos.get("matricula", "")).strip() == matricula
+            }
 
             listaComprobantes = [
                 {

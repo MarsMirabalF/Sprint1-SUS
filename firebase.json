@@ -1,0 +1,5 @@
+{
+  "database": {
+    "rules": "servidorSeguroUniversitario/baseDatos/database.rules.json"
+  }
+}
