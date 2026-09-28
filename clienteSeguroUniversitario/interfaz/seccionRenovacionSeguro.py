@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Entry, Frame, Label, StringVar, Toplevel
+    from tkinter import Button, Entry, Frame, Label, StringVar, Toplevel, messagebox
 except ModuleNotFoundError:
     class widgetNoDisponible:
         def __init__(self, *args, **kwargs):
@@ -9,6 +9,15 @@ except ModuleNotFoundError:
 
     Button = Entry = Frame = Label = Toplevel = widgetNoDisponible
     StringVar = widgetNoDisponible
+
+    class messagebox:
+        @staticmethod
+        def askyesno(*args, **kwargs):
+            raise ModuleNotFoundError(
+                "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
+            )
+
+        showinfo = showwarning = showerror = askyesno
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -137,6 +146,21 @@ class seccionRenovacionSeguro:
             cursor="hand2",
         ).grid(row=0, column=2, padx=(16, 0))
 
+        Button(
+            marcoBusqueda,
+            text="Renovar seguro",
+            command=self.confirmarRenovacion,
+            bg=COLOR_ACENTO,
+            fg=COLOR_PRINCIPAL,
+            activebackground=COLOR_SECUNDARIO,
+            activeforeground=COLOR_FONDO,
+            font=("Segoe UI Semibold", 11),
+            bd=0,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        ).grid(row=0, column=3, padx=(8, 0))
+
         marcoEstado = Frame(
             marcoPrincipal,
             bg=COLOR_FONDO,
@@ -233,6 +257,54 @@ class seccionRenovacionSeguro:
         self.variableInicio.set("-")
         self.variableFin.set("-")
         self.variableUltimaRenovacion.set("-")
+
+    def confirmarRenovacion(self):
+        matricula = self.variableMatricula.get().strip()
+        if not matricula:
+            self.variableEstado.set("Debe ingresar una matrícula para renovar el seguro.")
+            self.etiquetaEstado.configure(fg=COLOR_ERROR)
+            return
+
+        confirmar = messagebox.askyesno(
+            "Confirmar renovación",
+            (
+                f"¿Desea renovar el seguro universitario de la matrícula {matricula}?\n\n"
+                "La operación verificará la matrícula del periodo vigente y actualizará "
+                "la vigencia del seguro."
+            ),
+            parent=self.ventanaRaiz,
+        )
+        if confirmar:
+            self.renovarSeguro()
+
+    def renovarSeguro(self):
+        matricula = self.variableMatricula.get().strip()
+        try:
+            resultado = self.obtenerServicioRenovacion().renovarSeguro(matricula)
+        except Exception as error:
+            resultado = {
+                "exito": False,
+                "mensaje": f"Ocurrió un error inesperado al renovar el seguro: {error}",
+            }
+
+        if resultado.get("exito"):
+            self.variableEstado.set(resultado.get("estadoVigencia", ESTADO_VIGENTE))
+            self.variableInicio.set(resultado.get("fechaInicioVigencia") or "-")
+            self.variableFin.set(resultado.get("fechaFinVigencia") or "-")
+            self.variableUltimaRenovacion.set(resultado.get("fechaRenovacion") or "-")
+            self.etiquetaEstado.configure(fg=COLOR_PRINCIPAL)
+            messagebox.showinfo(
+                "Renovación exitosa",
+                resultado.get("mensaje", "La renovación del seguro se realizó con éxito."),
+                parent=self.ventanaRaiz,
+            )
+            return
+
+        messagebox.showwarning(
+            "Renovación no realizada",
+            resultado.get("mensaje", "No fue posible renovar el seguro."),
+            parent=self.ventanaRaiz,
+        )
 
 
 def abrirVentanaRenovacion(ventanaPadre, matriculaInicial="", fabricaServicio=None):
