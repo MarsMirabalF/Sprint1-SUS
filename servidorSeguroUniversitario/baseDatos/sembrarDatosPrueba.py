@@ -1,5 +1,6 @@
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
 
+
 # ----------------------------------------------------------------------
 # Estudiantes
 # ----------------------------------------------------------------------
@@ -36,6 +37,7 @@ ESTUDIANTES_DE_PRUEBA = {
         "tieneSeguroActivo": False,
     },
 }
+
 
 # ----------------------------------------------------------------------
 # Afiliados
@@ -91,6 +93,7 @@ AFILIADOS_DE_PRUEBA = [
     },
 ]
 
+
 # ----------------------------------------------------------------------
 # Periodos académicos (el id es la clave del nodo)
 # El periodo vigente se determina comparando la fecha de hoy con
@@ -113,6 +116,7 @@ PERIODOS_ACADEMICOS_DE_PRUEBA = {
         "fechaFin": "2027-06-30",
     },
 }
+
 
 # ----------------------------------------------------------------------
 # Matriculaciones (clave: "<matricula>_<idPeriodo>")
@@ -167,6 +171,7 @@ MATRICULACIONES_DE_PRUEBA = {
     },
 }
 
+
 # ----------------------------------------------------------------------
 # Seguros (clave: matrícula)
 # Maria y Ana no tienen registro -> "Sin vigencia registrada".
@@ -198,6 +203,7 @@ SEGUROS_DE_PRUEBA = {
     },
 }
 
+
 # ----------------------------------------------------------------------
 # Historial de renovaciones (clave: "<matricula>_<idPeriodo>")
 # ----------------------------------------------------------------------
@@ -227,6 +233,7 @@ RENOVACIONES_DE_PRUEBA = {
         "fechaRenovacion": "2026-02-04 12:00:00",
     },
 }
+
 
 # ----------------------------------------------------------------------
 # Servicios médicos
@@ -275,6 +282,7 @@ SERVICIOS_MEDICOS_DE_PRUEBA = {
         "cubierto": False,
     },
 }
+
 
 # ----------------------------------------------------------------------
 # Consultas médicas
