@@ -26,6 +26,26 @@
 
       ".write": true
 
+    },
+
+    "consultasMedicas": {
+
+      ".read": true,
+
+      ".write": true,
+
+      ".indexOn": ["matricula"]
+
+    },
+
+    "comprobantesMedicos": {
+
+      ".read": true,
+
+      ".write": true,
+
+      ".indexOn": ["matricula"]
+
     }
 
   }
