@@ -190,6 +190,38 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
 
         vista.botonDescargar.configure.assert_called_once_with(state="disabled")
 
+    def test_seccion_renovacion_actualiza_estado_y_fechas(self):
+        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import (
+            seccionRenovacionSeguro,
+        )
+
+        seccion = seccionRenovacionSeguro.__new__(seccionRenovacionSeguro)
+        seccion.variableMatricula = variableSimulada("20231002")
+        seccion.variableEstado = variableSimulada("")
+        seccion.variableInicio = variableSimulada("")
+        seccion.variableFin = variableSimulada("")
+        seccion.variableUltimaRenovacion = variableSimulada("")
+        seccion.etiquetaEstado = Mock()
+        seccion.fabricaServicio = Mock(
+            return_value=Mock(
+                consultarEstadoSeguro=Mock(
+                    return_value={
+                        "exito": True,
+                        "estadoVigencia": "Vigente",
+                        "fechaInicioVigencia": "2026-08-01",
+                        "fechaFinVigencia": "2026-12-15",
+                        "fechaUltimaRenovacion": "2026-08-03 09:45:00",
+                    }
+                )
+            )
+        )
+        seccion.servicio = None
+
+        seccion.consultarEstadoSeguro()
+
+        self.assertEqual(seccion.variableEstado.get(), "Vigente")
+        self.assertEqual(seccion.variableFin.get(), "2026-12-15")
+
 
 if __name__ == "__main__":
     unittest.main()

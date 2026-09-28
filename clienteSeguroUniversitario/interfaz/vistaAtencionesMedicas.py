@@ -138,35 +138,13 @@ class vistaAtencionesMedicas:
         marcoTabla.columnconfigure(0, weight=1)
         marcoTabla.rowconfigure(0, weight=1)
 
-        estiloTabla = ttk.Style(self.ventanaRaiz)
-        estiloTabla.configure(
-            "Atenciones.Treeview",
-            background=COLOR_FONDO,
-            fieldbackground=COLOR_FONDO,
-            foreground=COLOR_PRINCIPAL,
-            rowheight=30,
-            borderwidth=1,
-            relief="solid",
-            padding=2,
-        )
-        estiloTabla.configure(
-            "Atenciones.Treeview.Heading",
-            background=COLOR_ACENTO,
-            foreground=COLOR_PRINCIPAL,
-            borderwidth=1,
-            relief="solid",
-            padding=(8, 6),
-        )
-
         columnas = ("fecha", "hora", "servicio", "medico", "observaciones")
         self.tablaAtenciones = ttk.Treeview(
             marcoTabla,
             columns=columnas,
             show="headings",
             selectmode="browse",
-            style="Atenciones.Treeview",
         )
-        self.tablaAtenciones.tag_configure("filaPar", background="#EEEADD")
         encabezados = {
             "fecha": "Fecha",
             "hora": "Hora",
@@ -265,7 +243,6 @@ class vistaAtencionesMedicas:
                     consulta.get("medicoTratante", "") or "-",
                     consulta.get("observaciones", "") or "-",
                 ),
-                tags=("filaPar",) if len(self.tablaAtenciones.get_children()) % 2 == 0 else (),
             )
 
         self.variableEstado.set(resultado.get("mensaje", "Atenciones consultadas."))
