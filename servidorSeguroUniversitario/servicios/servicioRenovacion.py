@@ -32,8 +32,6 @@ CODIGO_ERROR_INESPERADO = "ERROR_INESPERADO"
 
 
 class servicioRenovacion:
-    """Encapsula las reglas y el acceso a datos de la renovación del seguro."""
-
     def __init__(self):
         self.referenciaRaiz = obtenerReferencia(NODO_RAIZ)
         self.referenciaEstudiantes = obtenerReferencia(NODO_ESTUDIANTES)
@@ -42,11 +40,8 @@ class servicioRenovacion:
         self.referenciaMatriculaciones = obtenerReferencia(NODO_MATRICULACIONES)
         self.referenciaSeguros = obtenerReferencia(NODO_SEGUROS)
 
-    # ------------------------------------------------------------------
-    # Consultas internas
-    # ------------------------------------------------------------------
+# Consultas internas
     def _obtenerPeriodoVigente(self, fechaHoy):
-        """Devuelve (idPeriodo, datos) del periodo cuyo rango contiene fechaHoy, o (None, None)."""
         periodos = self.referenciaPeriodosAcademicos.get() or {}
         for idPeriodo, datos in periodos.items():
             if datos.get("fechaInicio", "") <= fechaHoy <= datos.get("fechaFin", ""):
@@ -54,7 +49,6 @@ class servicioRenovacion:
         return None, None
 
     def _obtenerAfiliacionActiva(self, matricula):
-        """Devuelve el registro de afiliación activo de esa matrícula, o None."""
         resultados = (
             self.referenciaAfiliados.order_by_child("matricula")
             .equal_to(matricula)
@@ -75,7 +69,6 @@ class servicioRenovacion:
         return ESTADO_VIGENTE if fechaFinVigencia >= fechaHoy else ESTADO_VENCIDO
 
     def _validarMatricula(self, matricula):
-        """Devuelve (matriculaLimpia, resultadoError). Si hay error, matriculaLimpia es None."""
         if not matricula or not str(matricula).strip():
             return None, {
                 "exito": False,
@@ -91,15 +84,8 @@ class servicioRenovacion:
             }
         return matricula, None
 
-    # ------------------------------------------------------------------
-    # Operaciones públicas
-    # ------------------------------------------------------------------
+# Operaciones públicas
     def consultarEstadoSeguro(self, matricula, fechaReferencia=None):
-        """
-        Devuelve la vigencia del seguro y su estado (Vigente / Vencido /
-        Sin vigencia registrada). Sirve para el estado en el perfil y para
-        mostrar la fecha de vigencia en el carnet digital.
-        """
         try:
             matricula, error = self._validarMatricula(matricula)
             if error:
@@ -128,11 +114,6 @@ class servicioRenovacion:
             }
 
     def renovarSeguro(self, matricula, fechaReferencia=None):
-        """
-        Ejecuta la renovación del seguro. Solo necesita la matrícula.
-
-        fechaReferencia: opcional ("YYYY-MM-DD"), para pruebas. Por defecto, hoy.
-        """
         try:
             matricula, error = self._validarMatricula(matricula)
             if error:
