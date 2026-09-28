@@ -1,10 +1,3 @@
-"""
-validadores.py
-
-Funciones de validación de formato reutilizables para los servicios de
-backend relacionados con la Base de Datos.
-"""
-
 import re
 
 PATRON_CORREO = r"^[\w\.\-]+@[\w\.\-]+\.\w+$"

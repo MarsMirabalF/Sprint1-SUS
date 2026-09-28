@@ -1,30 +1,3 @@
-"""
-servicioRenovacion.py
-
-HU 10 — Renovación del seguro universitario.
-
-Servicio de backend (sin UI) responsable de:
-    1. Renovar el seguro de un estudiante recibiendo SOLO su matrícula (los
-       datos personales se toman de su afiliación ya registrada, no se
-       vuelven a pedir).
-    2. Validar que el estudiante figure como matriculado en el periodo
-       académico vigente antes de aprobar la renovación.
-    3. Registrar la nueva vigencia del seguro y dejar constancia de la
-       renovación.
-    4. Consultar el estado de vigencia del seguro (para el perfil y el
-       carnet digital).
-
-Reglas de negocio aplicadas:
-    - Debe existir una afiliación activa (HU 6) para poder renovar.
-    - Debe existir un periodo académico vigente (hoy dentro de su rango).
-    - El estudiante debe estar "matriculado" en ese periodo.
-    - No se puede renovar dos veces para el mismo periodo.
-    - La nueva vigencia va desde el inicio hasta el fin del periodo vigente.
-
-Cada método público devuelve un diccionario con el resultado (éxito/código/
-mensaje/datos) para que la capa de UI decida qué mostrar.
-"""
-
 from datetime import datetime
 
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
