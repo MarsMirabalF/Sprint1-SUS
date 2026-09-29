@@ -32,32 +32,23 @@ CODIGO_ERROR_INESPERADO = "ERROR_INESPERADO"
 
 
 class servicioComprobante:
-    """Encapsula la validación de descarga, la generación del PDF y su guardado en el perfil (DB)."""
-
     def __init__(self, carpetaComprobantes=None):
         self.referenciaEstudiantes = obtenerReferencia(NODO_ESTUDIANTES)
         self.referenciaConsultasMedicas = obtenerReferencia(NODO_CONSULTAS_MEDICAS)
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
         self.carpetaComprobantes = carpetaComprobantes or CARPETA_COMPROBANTES_POR_DEFECTO
 
-    # ------------------------------------------------------------------
-    # Consultas internas
-    # ------------------------------------------------------------------
+# Consultas internas
     def _obtenerConsultasDelEstudiante(self, matricula):
         """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
-        resultados = self.referenciaConsultasMedicas.get() or {}
-        return {
-            idConsulta: datos
-            for idConsulta, datos in resultados.items()
-            if isinstance(datos, dict) and str(datos.get("matricula", "")).strip() == matricula
-        }
+        resultados = (
+            self.referenciaConsultasMedicas.order_by_child("matricula")
+            .equal_to(matricula)
+            .get()
+        )
+        return resultados or {}
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
-        """
-        Consultas de esa matrícula con fechaConsulta <= fechaReferencia
-        (por defecto, la fecha de hoy). Se devuelven ordenadas de la más
-        reciente a la más antigua.
-        """
         fechaLimite = fechaReferencia or datetime.now().strftime(FORMATO_FECHA)
         todasLasConsultas = self._obtenerConsultasDelEstudiante(matricula)
 
@@ -75,14 +66,8 @@ class servicioComprobante:
             )
         )
 
-    # ------------------------------------------------------------------
-    # Operaciones públicas
-    # ------------------------------------------------------------------
+# Operaciones públicas
     def habilitarBotonDescarga(self, matricula, fechaReferencia=None):
-        """
-        Determina si el botón de descarga debe estar habilitado para esta
-        matrícula (criterio de aceptación 3).
-        """
         try:
             if not matricula or not str(matricula).strip():
                 return {
@@ -130,7 +115,6 @@ class servicioComprobante:
             }
 
     def obtenerConsultasDelEstudiante(self, matricula):
-        """Lista completa de consultas de un estudiante (para una futura vista de atenciones)."""
         try:
             if not matricula or not str(matricula).strip():
                 return {
@@ -160,18 +144,6 @@ class servicioComprobante:
             }
 
     def generarComprobante(self, matricula, idConsulta=None):
-        """
-        Genera el PDF descargable con el nombre del estudiante y la fecha de
-        la atención (criterio de aceptación 2), siempre que exista al menos
-        una consulta previa válida (criterio de aceptación 3), y lo guarda
-        en el perfil del estudiante en la base de datos (nodo
-        "comprobantesMedicos"), además de dejarlo en disco.
-
-        matricula: matrícula del estudiante.
-        idConsulta: opcional. Si no se indica, se usa la consulta previa más
-            reciente. Si se indica, debe ser una consulta previa válida de
-            ese mismo estudiante.
-        """
         try:
             matricula = str(matricula).strip() if matricula else ""
 
@@ -220,11 +192,6 @@ class servicioComprobante:
             }
 
     def listarComprobantesDelEstudiante(self, matricula):
-        """
-        Lista los comprobantes ya guardados en el perfil del estudiante
-        (metadatos únicamente, sin el contenido del PDF, para que la lista
-        sea liviana). Pensado para la futura pantalla "mis comprobantes".
-        """
         try:
             matricula = str(matricula).strip() if matricula else ""
             if not matricula:
@@ -234,12 +201,12 @@ class servicioComprobante:
                     "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = self.referenciaComprobantesMedicos.get() or {}
-            resultados = {
-                idConsulta: datos
-                for idConsulta, datos in resultados.items()
-                if isinstance(datos, dict) and str(datos.get("matricula", "")).strip() == matricula
-            }
+            resultados = (
+                self.referenciaComprobantesMedicos.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+                or {}
+            )
 
             listaComprobantes = [
                 {
@@ -269,12 +236,6 @@ class servicioComprobante:
             }
 
     def descargarComprobanteGuardado(self, idConsulta, carpetaDestino=None):
-        """
-        Recupera un comprobante ya guardado en la DB (por su idConsulta) y lo
-        vuelve a escribir como archivo PDF en disco. Sirve para volver a
-        verlo/descargarlo sin depender de que siga existiendo el archivo
-        local original (por ejemplo, en otra instalación de la app).
-        """
         try:
             if not idConsulta or not str(idConsulta).strip():
                 return {
@@ -317,9 +278,7 @@ class servicioComprobante:
                 "mensaje": f"Ocurrió un error inesperado al recuperar el comprobante: {error}",
             }
 
-    # ------------------------------------------------------------------
-    # Generación del archivo y guardado en el perfil (DB)
-    # ------------------------------------------------------------------
+# Generación del archivo y guardado en el perfil (DB)
     def _generarArchivoPdf(self, idConsulta, datosConsulta):
         os.makedirs(self.carpetaComprobantes, exist_ok=True)
 
@@ -362,7 +321,7 @@ class servicioComprobante:
 
         if os.path.exists(RUTA_FIRMA_DIGITAL):
             anchoFirma = 55
-            altoFirma = 25  # proporcional a la imagen de firma (1200x550 px aprox.)
+            altoFirma = 25 
             yFirma = pdf.get_y()
             pdf.image(RUTA_FIRMA_DIGITAL, x=20, y=yFirma, w=anchoFirma, h=altoFirma)
             pdf.set_y(yFirma + altoFirma + 2)
@@ -371,9 +330,6 @@ class servicioComprobante:
             pdf.cell(anchoFirma + 10, 5, "Firma digital autorizada", ln=True)
             pdf.cell(anchoFirma + 10, 5, "Seguro Social Universitario", ln=True)
         else:
-            # No debería pasar en un entorno correctamente configurado, pero
-            # se deja constancia en el propio PDF en vez de fallar la
-            # generación completa del comprobante.
             pdf.set_font("Helvetica", "I", 9)
             pdf.cell(0, 5, "[Firma digital no disponible]", ln=True)
 
@@ -389,13 +345,13 @@ class servicioComprobante:
         return nombreArchivo, rutaArchivo, contenidoPdf
 
     def _guardarComprobanteEnPerfil(self, idConsulta, datosConsulta, nombreArchivo, contenidoPdf):
-        """Guarda el PDF (en base64) y sus metadatos en comprobantesMedicos/{idConsulta}."""
         registro = {
             "matricula": datosConsulta.get("matricula", ""),
             "cedulaIdentidad": datosConsulta.get("cedulaIdentidad", ""),
             "nombreCompleto": datosConsulta.get("nombreCompleto", ""),
             "idConsulta": idConsulta,
             "nombreServicio": datosConsulta.get("nombreServicio", ""),
+            "medicoTratante": datosConsulta.get("medicoTratante", ""),
             "fechaConsulta": datosConsulta.get("fechaConsulta", ""),
             "fechaGeneracion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "nombreArchivo": nombreArchivo,
