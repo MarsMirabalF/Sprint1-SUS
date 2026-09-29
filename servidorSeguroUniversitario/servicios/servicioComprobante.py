@@ -39,14 +39,22 @@ class servicioComprobante:
         self.carpetaComprobantes = carpetaComprobantes or CARPETA_COMPROBANTES_POR_DEFECTO
 
 # Consultas internas
+    def _obtenerRegistrosPorMatricula(self, referencia, matricula):
+        try:
+            return referencia.order_by_child("matricula").equal_to(matricula).get() or {}
+        except Exception as error:
+            if "Index not defined" not in str(error):
+                raise
+            registros = referencia.get() or {}
+            return {
+                idRegistro: datos
+                for idRegistro, datos in registros.items()
+                if datos.get("matricula") == matricula
+            }
+
     def _obtenerConsultasDelEstudiante(self, matricula):
         """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
-        resultados = (
-            self.referenciaConsultasMedicas.order_by_child("matricula")
-            .equal_to(matricula)
-            .get()
-        )
-        return resultados or {}
+        return self._obtenerRegistrosPorMatricula(self.referenciaConsultasMedicas, matricula)
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
         fechaLimite = fechaReferencia or datetime.now().strftime(FORMATO_FECHA)
@@ -201,11 +209,8 @@ class servicioComprobante:
                     "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = (
-                self.referenciaComprobantesMedicos.order_by_child("matricula")
-                .equal_to(matricula)
-                .get()
-                or {}
+            resultados = self._obtenerRegistrosPorMatricula(
+                self.referenciaComprobantesMedicos, matricula
             )
 
             listaComprobantes = [

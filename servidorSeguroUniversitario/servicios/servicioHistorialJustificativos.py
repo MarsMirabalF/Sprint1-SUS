@@ -11,6 +11,24 @@ class servicioHistorialJustificativos:
     def __init__(self):
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
 
+    def _obtenerComprobantesPorMatricula(self, matricula):
+        try:
+            return (
+                self.referenciaComprobantesMedicos.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+                or {}
+            )
+        except Exception as error:
+            if "Index not defined" not in str(error):
+                raise
+            registros = self.referenciaComprobantesMedicos.get() or {}
+            return {
+                idComprobante: datos
+                for idComprobante, datos in registros.items()
+                if datos.get("matricula") == matricula
+            }
+
     def obtenerHistorial(self, matricula):
         try:
             matricula = str(matricula).strip() if matricula else ""
@@ -21,12 +39,7 @@ class servicioHistorialJustificativos:
                     "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = (
-                self.referenciaComprobantesMedicos.order_by_child("matricula")
-                .equal_to(matricula)
-                .get()
-                or {}
-            )
+            resultados = self._obtenerComprobantesPorMatricula(matricula)
 
             historial = [
                 {
