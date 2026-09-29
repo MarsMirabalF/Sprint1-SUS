@@ -1,5 +1,9 @@
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
 
+
+# ----------------------------------------------------------------------
+# Estudiantes
+# ----------------------------------------------------------------------
 ESTUDIANTES_DE_PRUEBA = {
     "20231001": {
         "cedulaIdentidad": "9876543",
@@ -20,8 +24,24 @@ ESTUDIANTES_DE_PRUEBA = {
         "carrera": "Derecho",
         "tieneSeguroActivo": False,
     },
+    "20231004": {
+        "cedulaIdentidad": "3344556",
+        "nombreCompleto": "Carlos Andres Villca",
+        "carrera": "Arquitectura",
+        "tieneSeguroActivo": True,
+    },
+    "20231005": {
+        "cedulaIdentidad": "7788990",
+        "nombreCompleto": "Lucia Valeria Choque",
+        "carrera": "Enfermeria",
+        "tieneSeguroActivo": False,
+    },
 }
- 
+
+
+# ----------------------------------------------------------------------
+# Afiliados
+# ----------------------------------------------------------------------
 AFILIADOS_DE_PRUEBA = [
     {
         "matricula": "20231002",
@@ -47,9 +67,177 @@ AFILIADOS_DE_PRUEBA = [
         "fechaAfiliacion": "2024-08-01 08:00:00",
         "estado": "inactivo",
     },
+    {
+        "matricula": "20231004",
+        "cedulaIdentidad": "3344556",
+        "nombreCompleto": "Carlos Andres Villca",
+        "carrera": "Arquitectura",
+        "correoElectronico": "carlos.villca@uni.edu.bo",
+        "telefono": "70155667",
+        "direccion": "Av. Arce #1020",
+        "fechaNacimiento": "2001-05-14",
+        "fechaAfiliacion": "2026-01-20 10:30:00",
+        "estado": "activo",
+    },
+    {
+        "matricula": "20231005",
+        "cedulaIdentidad": "7788990",
+        "nombreCompleto": "Lucia Valeria Choque",
+        "carrera": "Enfermeria",
+        "correoElectronico": "lucia.choque@uni.edu.bo",
+        "telefono": "70233445",
+        "direccion": "Calle Murillo #88",
+        "fechaNacimiento": "2002-09-30",
+        "fechaAfiliacion": "2026-02-03 11:15:00",
+        "estado": "activo",
+    },
 ]
- 
- 
+
+
+# ----------------------------------------------------------------------
+# Periodos académicos (el id es la clave del nodo)
+# El periodo vigente se determina comparando la fecha de hoy con
+# fechaInicio y fechaFin.
+# ----------------------------------------------------------------------
+PERIODOS_ACADEMICOS_DE_PRUEBA = {
+    "2026-1": {
+        "nombre": "Primer semestre 2026",
+        "fechaInicio": "2026-02-01",
+        "fechaFin": "2026-06-30",
+    },
+    "2026-2": {
+        "nombre": "Segundo semestre 2026",
+        "fechaInicio": "2026-08-01",
+        "fechaFin": "2026-12-15",
+    },
+    "2027-1": {
+        "nombre": "Primer semestre 2027",
+        "fechaInicio": "2027-02-01",
+        "fechaFin": "2027-06-30",
+    },
+}
+
+
+# ----------------------------------------------------------------------
+# Matriculaciones (clave: "<matricula>_<idPeriodo>")
+# ----------------------------------------------------------------------
+MATRICULACIONES_DE_PRUEBA = {
+    # Maria: matriculada, pero sin afiliación -> SIN_AFILIACION_ACTIVA
+    "20231001_2026-2": {
+        "matricula": "20231001",
+        "idPeriodo": "2026-2",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-07-25",
+    },
+    # Juan: afiliado activo, matriculado, seguro vencido -> puede renovar
+    "20231002_2026-1": {
+        "matricula": "20231002",
+        "idPeriodo": "2026-1",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-01-20",
+    },
+    "20231002_2026-2": {
+        "matricula": "20231002",
+        "idPeriodo": "2026-2",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-07-26",
+    },
+    # Ana: matriculada, pero su afiliación está inactiva -> SIN_AFILIACION_ACTIVA
+    "20231003_2026-2": {
+        "matricula": "20231003",
+        "idPeriodo": "2026-2",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-07-28",
+    },
+    # Carlos: matriculado y ya renovado para 2026-2 -> YA_RENOVADO_EN_PERIODO
+    "20231004_2026-2": {
+        "matricula": "20231004",
+        "idPeriodo": "2026-2",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-07-27",
+    },
+    # Lucia: afiliada activa pero retirada del periodo -> NO_MATRICULADO_EN_PERIODO
+    "20231005_2026-1": {
+        "matricula": "20231005",
+        "idPeriodo": "2026-1",
+        "estado": "matriculado",
+        "fechaMatriculacion": "2026-02-02",
+    },
+    "20231005_2026-2": {
+        "matricula": "20231005",
+        "idPeriodo": "2026-2",
+        "estado": "retirado",
+        "fechaMatriculacion": "2026-07-29",
+    },
+}
+
+
+# ----------------------------------------------------------------------
+# Seguros (clave: matrícula)
+# Maria y Ana no tienen registro -> "Sin vigencia registrada".
+# ----------------------------------------------------------------------
+SEGUROS_DE_PRUEBA = {
+    # Vencido (terminó el periodo 2026-1)
+    "20231002": {
+        "matricula": "20231002",
+        "idPeriodo": "2026-1",
+        "fechaInicioVigencia": "2026-02-01",
+        "fechaFinVigencia": "2026-06-30",
+        "fechaUltimaRenovacion": "2026-01-22 10:00:00",
+    },
+    # Vigente (ya renovado para 2026-2)
+    "20231004": {
+        "matricula": "20231004",
+        "idPeriodo": "2026-2",
+        "fechaInicioVigencia": "2026-08-01",
+        "fechaFinVigencia": "2026-12-15",
+        "fechaUltimaRenovacion": "2026-08-03 09:45:00",
+    },
+    # Vencido (terminó el periodo 2026-1)
+    "20231005": {
+        "matricula": "20231005",
+        "idPeriodo": "2026-1",
+        "fechaInicioVigencia": "2026-02-01",
+        "fechaFinVigencia": "2026-06-30",
+        "fechaUltimaRenovacion": "2026-02-04 12:00:00",
+    },
+}
+
+
+# ----------------------------------------------------------------------
+# Historial de renovaciones (clave: "<matricula>_<idPeriodo>")
+# ----------------------------------------------------------------------
+RENOVACIONES_DE_PRUEBA = {
+    "20231002_2026-1": {
+        "matricula": "20231002",
+        "nombreCompleto": "Juan Pablo Quispe",
+        "idPeriodo": "2026-1",
+        "fechaVigenciaAnterior": "",
+        "fechaVigenciaNueva": "2026-06-30",
+        "fechaRenovacion": "2026-01-22 10:00:00",
+    },
+    "20231004_2026-2": {
+        "matricula": "20231004",
+        "nombreCompleto": "Carlos Andres Villca",
+        "idPeriodo": "2026-2",
+        "fechaVigenciaAnterior": "2026-06-30",
+        "fechaVigenciaNueva": "2026-12-15",
+        "fechaRenovacion": "2026-08-03 09:45:00",
+    },
+    "20231005_2026-1": {
+        "matricula": "20231005",
+        "nombreCompleto": "Lucia Valeria Choque",
+        "idPeriodo": "2026-1",
+        "fechaVigenciaAnterior": "",
+        "fechaVigenciaNueva": "2026-06-30",
+        "fechaRenovacion": "2026-02-04 12:00:00",
+    },
+}
+
+
+# ----------------------------------------------------------------------
+# Servicios médicos
+# ----------------------------------------------------------------------
 SERVICIOS_MEDICOS_DE_PRUEBA = {
     "consultaMedicaGeneral": {
         "nombreServicio": "Consulta médica general",
@@ -94,8 +282,11 @@ SERVICIOS_MEDICOS_DE_PRUEBA = {
         "cubierto": False,
     },
 }
- 
- 
+
+
+# ----------------------------------------------------------------------
+# Consultas médicas
+# ----------------------------------------------------------------------
 CONSULTAS_MEDICAS_DE_PRUEBA = [
     {
         "matricula": "20231001",
@@ -131,6 +322,65 @@ CONSULTAS_MEDICAS_DE_PRUEBA = [
         "observaciones": "Consulta programada (fecha futura), a propósito para pruebas.",
     },
 ]
+
+
+# ----------------------------------------------------------------------
+# Comprobantes / justificativos médicos (clave: idConsulta)
+# Simulan justificativos ya generados antes (HU 17), para probar el
+# historial (HU 11). Fechas desordenadas a propósito, para comprobar que
+# el servicio las ordena de la más reciente a la más antigua.
+# ----------------------------------------------------------------------
+COMPROBANTES_MEDICOS_DE_PRUEBA = {
+    "consultaPrueba001": {
+        "matricula": "20231001",
+        "cedulaIdentidad": "9876543",
+        "nombreCompleto": "Maria Fernanda Rojas",
+        "idConsulta": "consultaPrueba001",
+        "nombreServicio": "Consulta médica general",
+        "medicoTratante": "Dr. Carlos Fernandez",
+        "fechaConsulta": "2026-08-10",
+        "fechaGeneracion": "2026-08-10 12:00:00",
+        "nombreArchivo": "comprobante_20231001_consultaPrueba001.pdf",
+        "contenidoBase64": "",
+    },
+    "consultaPrueba002": {
+        "matricula": "20231001",
+        "cedulaIdentidad": "9876543",
+        "nombreCompleto": "Maria Fernanda Rojas",
+        "idConsulta": "consultaPrueba002",
+        "nombreServicio": "Exámenes de laboratorio",
+        "medicoTratante": "Dra. Lucia Perez",
+        "fechaConsulta": "2026-09-15",
+        "fechaGeneracion": "2026-09-15 13:20:00",
+        "nombreArchivo": "comprobante_20231001_consultaPrueba002.pdf",
+        "contenidoBase64": "",
+    },
+    "consultaPrueba003": {
+        "matricula": "20231001",
+        "cedulaIdentidad": "9876543",
+        "nombreCompleto": "Maria Fernanda Rojas",
+        "idConsulta": "consultaPrueba003",
+        "nombreServicio": "Atención de emergencias",
+        "medicoTratante": "Dr. Ramiro Salinas",
+        "fechaConsulta": "2026-06-02",
+        "fechaGeneracion": "2026-06-02 08:45:00",
+        "nombreArchivo": "comprobante_20231001_consultaPrueba003.pdf",
+        "contenidoBase64": "",
+    },
+    "consultaPrueba004": {
+        "matricula": "20231002",
+        "cedulaIdentidad": "1122334",
+        "nombreCompleto": "Juan Pablo Quispe",
+        "idConsulta": "consultaPrueba004",
+        "nombreServicio": "Consulta médica general",
+        "medicoTratante": "Dr. Carlos Fernandez",
+        "fechaConsulta": "2026-03-05",
+        "fechaGeneracion": "2026-03-05 09:00:00",
+        "nombreArchivo": "comprobante_20231002_consultaPrueba004.pdf",
+        "contenidoBase64": "",
+    },
+}
+# Orden esperado del historial de 20231001: 2026-09-15, 2026-08-10, 2026-06-02.
 
 
 # ----------------------------------------------------------------------
@@ -186,6 +436,12 @@ def sembrarConsultasMedicasDePrueba():
     print("Datos de prueba insertados en el nodo 'consultasMedicas'.")
 
 
+def sembrarComprobantesMedicosDePrueba():
+    referenciaComprobantesMedicos = obtenerReferencia("comprobantesMedicos")
+    referenciaComprobantesMedicos.update(COMPROBANTES_MEDICOS_DE_PRUEBA)
+    print("Datos de prueba insertados en el nodo 'comprobantesMedicos'.")
+
+
 def sembrarDatosDePrueba():
     sembrarEstudiantesDePrueba()
     sembrarAfiliadosDePrueba()
@@ -195,6 +451,7 @@ def sembrarDatosDePrueba():
     sembrarRenovacionesDePrueba()
     sembrarServiciosMedicosDePrueba()
     sembrarConsultasMedicasDePrueba()
+    sembrarComprobantesMedicosDePrueba()
 
 
 if __name__ == "__main__":
