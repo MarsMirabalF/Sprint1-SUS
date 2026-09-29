@@ -190,6 +190,97 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
 
         vista.botonDescargar.configure.assert_called_once_with(state="disabled")
 
+    def test_seccion_renovacion_actualiza_estado_y_fechas(self):
+        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import (
+            seccionRenovacionSeguro,
+        )
+
+        seccion = seccionRenovacionSeguro.__new__(seccionRenovacionSeguro)
+        seccion.variableMatricula = variableSimulada("20231002")
+        seccion.variableEstado = variableSimulada("")
+        seccion.variableInicio = variableSimulada("")
+        seccion.variableFin = variableSimulada("")
+        seccion.variableUltimaRenovacion = variableSimulada("")
+        seccion.etiquetaEstado = Mock()
+        seccion.fabricaServicio = Mock(
+            return_value=Mock(
+                consultarEstadoSeguro=Mock(
+                    return_value={
+                        "exito": True,
+                        "estadoVigencia": "Vigente",
+                        "fechaInicioVigencia": "2026-08-01",
+                        "fechaFinVigencia": "2026-12-15",
+                        "fechaUltimaRenovacion": "2026-08-03 09:45:00",
+                    }
+                )
+            )
+        )
+        seccion.servicio = None
+
+        seccion.consultarEstadoSeguro()
+
+        self.assertEqual(seccion.variableEstado.get(), "Vigente")
+        self.assertEqual(seccion.variableFin.get(), "2026-12-15")
+
+    def test_seccion_renovacion_confirma_y_actualiza_vigencia(self):
+        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import (
+            COLOR_PRINCIPAL,
+            seccionRenovacionSeguro,
+        )
+
+        servicioSimulado = Mock()
+        servicioSimulado.renovarSeguro.return_value = {
+            "exito": True,
+            "mensaje": "La renovación del seguro se realizó con éxito.",
+            "estadoVigencia": "Vigente",
+            "fechaInicioVigencia": "2026-08-01",
+            "fechaFinVigencia": "2026-12-15",
+            "fechaRenovacion": "2026-08-03 09:45:00",
+        }
+        seccion = seccionRenovacionSeguro.__new__(seccionRenovacionSeguro)
+        seccion.variableMatricula = variableSimulada("20231002")
+        seccion.variableEstado = variableSimulada("")
+        seccion.variableInicio = variableSimulada("")
+        seccion.variableFin = variableSimulada("")
+        seccion.variableUltimaRenovacion = variableSimulada("")
+        seccion.etiquetaEstado = Mock()
+        seccion.ventanaRaiz = Mock()
+        seccion.fabricaServicio = Mock(return_value=servicioSimulado)
+        seccion.servicio = None
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro.messagebox.askyesno",
+            return_value=True,
+        ), patch(
+            "clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro.messagebox.showinfo"
+        ):
+            seccion.confirmarRenovacion()
+
+        servicioSimulado.renovarSeguro.assert_called_once_with("20231002")
+        self.assertEqual(seccion.variableFin.get(), "2026-12-15")
+        seccion.etiquetaEstado.configure.assert_called_with(fg=COLOR_PRINCIPAL)
+
+    def test_seccion_renovacion_no_renueva_si_se_cancela_confirmacion(self):
+        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import (
+            seccionRenovacionSeguro,
+        )
+
+        servicioSimulado = Mock()
+        seccion = seccionRenovacionSeguro.__new__(seccionRenovacionSeguro)
+        seccion.variableMatricula = variableSimulada("20231002")
+        seccion.etiquetaEstado = Mock()
+        seccion.ventanaRaiz = Mock()
+        seccion.fabricaServicio = Mock(return_value=servicioSimulado)
+        seccion.servicio = None
+
+        with patch(
+            "clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro.messagebox.askyesno",
+            return_value=False,
+        ):
+            seccion.confirmarRenovacion()
+
+        servicioSimulado.renovarSeguro.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
