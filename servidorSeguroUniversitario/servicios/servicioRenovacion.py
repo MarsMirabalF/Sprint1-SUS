@@ -30,7 +30,6 @@ CODIGO_RENOVACION_EXITOSA = "RENOVACION_EXITOSA"
 CODIGO_ESTADO_SEGURO_OBTENIDO = "ESTADO_SEGURO_OBTENIDO"
 CODIGO_ERROR_INESPERADO = "ERROR_INESPERADO"
 
-
 class servicioRenovacion:
     def __init__(self):
         self.referenciaRaiz = obtenerReferencia(NODO_RAIZ)
