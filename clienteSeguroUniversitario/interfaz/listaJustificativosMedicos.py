@@ -28,6 +28,8 @@ class listaJustificativosMedicos:
         self.variableEstado = StringVar(value="Cargando justificativos médicos...")
         self.justificativos = []
         self.justificativoSeleccionado = None
+        self.columnaOrdenamiento = "fechaConsulta"
+        self.ordenDescendente = True
 
         self.configurarVentana()
         self.construirInterfaz()
@@ -160,8 +162,19 @@ class listaJustificativosMedicos:
             "archivo": "Archivo",
         }
         anchos = {"fecha": 140, "servicio": 210, "medico": 190, "generacion": 170, "archivo": 270}
+        clavesOrdenamiento = {
+            "fecha": "fechaConsulta",
+            "servicio": "nombreServicio",
+            "medico": "medicoTratante",
+            "generacion": "fechaGeneracion",
+            "archivo": "nombreArchivo",
+        }
         for columna in columnas:
-            self.tablaJustificativos.heading(columna, text=encabezados[columna])
+            self.tablaJustificativos.heading(
+                columna,
+                text=encabezados[columna],
+                command=lambda clave=clavesOrdenamiento[columna]: self.ordenarJustificativos(clave),
+            )
             self.tablaJustificativos.column(columna, width=anchos[columna], anchor="w")
         self.tablaJustificativos.grid(row=0, column=0, sticky="nsew")
         self.tablaJustificativos.bind("<<TreeviewSelect>>", self.seleccionarJustificativo)
@@ -191,6 +204,23 @@ class listaJustificativosMedicos:
             justificativo.get("fechaGeneracion", "") or "-",
             justificativo.get("nombreArchivo", "") or "-",
         )
+
+    def ordenarJustificativos(self, columna):
+        if columna == self.columnaOrdenamiento:
+            self.ordenDescendente = not self.ordenDescendente
+        else:
+            self.columnaOrdenamiento = columna
+            self.ordenDescendente = False
+
+        self.justificativos.sort(
+            key=lambda justificativo: str(justificativo.get(columna, "") or "").casefold(),
+            reverse=self.ordenDescendente,
+        )
+
+        for posicion, justificativo in enumerate(self.justificativos):
+            idConsulta = justificativo.get("idConsulta")
+            if idConsulta is not None and self.tablaJustificativos.exists(idConsulta):
+                self.tablaJustificativos.move(idConsulta, "", posicion)
 
     def cargarJustificativos(self):
         self.limpiarTabla()
