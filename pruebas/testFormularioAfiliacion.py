@@ -248,6 +248,26 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
             ),
         )
 
+    def test_detalle_justificativo_construye_datos(self):
+        from clienteSeguroUniversitario.interfaz.detalleJustificativoMedico import (
+            detalleJustificativoMedico,
+        )
+
+        detalle = detalleJustificativoMedico.__new__(detalleJustificativoMedico)
+        detalle.justificativo = {
+            "idConsulta": "consultaPrueba002",
+            "fechaConsulta": "2026-09-15",
+            "nombreServicio": "Exámenes de laboratorio",
+            "medicoTratante": "Dra. Lucia Perez",
+            "fechaGeneracion": "2026-09-15 13:20:00",
+            "nombreArchivo": "comprobante_20231001_consultaPrueba002.pdf",
+        }
+
+        datos = detalle.obtenerDatosDetalle()
+
+        self.assertEqual(datos[0], ("ID de consulta", "consultaPrueba002"))
+        self.assertEqual(datos[2], ("Servicio médico", "Exámenes de laboratorio"))
+
 
 if __name__ == "__main__":
     unittest.main()

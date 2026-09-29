@@ -27,6 +27,7 @@ class listaJustificativosMedicos:
         self.servicio = None
         self.variableEstado = StringVar(value="Cargando justificativos médicos...")
         self.justificativos = []
+        self.justificativoSeleccionado = None
 
         self.configurarVentana()
         self.construirInterfaz()
@@ -111,6 +112,24 @@ class listaJustificativosMedicos:
             cursor="hand2",
         ).grid(row=0, column=1, rowspan=2, sticky="e")
 
+        self.botonDetalle = Button(
+            encabezado,
+            text="Ver detalle",
+            command=self.abrirDetalle,
+            state="disabled",
+            bg=COLOR_FONDO,
+            fg=COLOR_PRINCIPAL,
+            activebackground=COLOR_ACENTO,
+            activeforeground=COLOR_PRINCIPAL,
+            disabledforeground=COLOR_SECUNDARIO,
+            font=("Segoe UI Semibold", 11),
+            bd=0,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        )
+        self.botonDetalle.grid(row=0, column=2, rowspan=2, sticky="e", padx=(8, 0))
+
         self.etiquetaEstado = Label(
             marcoPrincipal,
             textvariable=self.variableEstado,
@@ -145,6 +164,7 @@ class listaJustificativosMedicos:
             self.tablaJustificativos.heading(columna, text=encabezados[columna])
             self.tablaJustificativos.column(columna, width=anchos[columna], anchor="w")
         self.tablaJustificativos.grid(row=0, column=0, sticky="nsew")
+        self.tablaJustificativos.bind("<<TreeviewSelect>>", self.seleccionarJustificativo)
 
         barraDesplazamiento = ttk.Scrollbar(
             marcoTabla, orient="vertical", command=self.tablaJustificativos.yview
@@ -160,6 +180,8 @@ class listaJustificativosMedicos:
     def limpiarTabla(self):
         for elemento in self.tablaJustificativos.get_children():
             self.tablaJustificativos.delete(elemento)
+        self.justificativoSeleccionado = None
+        self.botonDetalle.configure(state="disabled")
 
     def construirValoresJustificativo(self, justificativo):
         return (
@@ -197,6 +219,32 @@ class listaJustificativosMedicos:
 
         self.variableEstado.set(resultado.get("mensaje", "Justificativos consultados."))
         self.etiquetaEstado.configure(fg=COLOR_SECUNDARIO)
+
+    def seleccionarJustificativo(self, evento=None):
+        seleccion = self.tablaJustificativos.selection()
+        idConsulta = seleccion[0] if seleccion else None
+        self.justificativoSeleccionado = next(
+            (
+                justificativo
+                for justificativo in self.justificativos
+                if justificativo.get("idConsulta") == idConsulta
+            ),
+            None,
+        )
+        self.botonDetalle.configure(
+            state="normal" if self.justificativoSeleccionado else "disabled"
+        )
+
+    def abrirDetalle(self):
+        if not self.justificativoSeleccionado:
+            self.botonDetalle.configure(state="disabled")
+            return
+
+        from clienteSeguroUniversitario.interfaz.detalleJustificativoMedico import (
+            abrirVentanaDetalleJustificativo,
+        )
+
+        abrirVentanaDetalleJustificativo(self.ventanaRaiz, self.justificativoSeleccionado)
 
 
 def abrirVentanaJustificativos(ventanaPadre, matricula, fabricaServicio=None):
