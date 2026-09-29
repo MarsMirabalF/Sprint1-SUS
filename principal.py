@@ -2,7 +2,7 @@
 
 import sys
 
-from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
+from clienteSeguroUniversitario.interfaz.dashboard import dashboard
 from clienteSeguroUniversitario.interfaz.login import login
 
 
@@ -14,7 +14,7 @@ def principal():
         def abrirAplicacion(resultadoLogin):
             for widget in ventanaPrincipal.winfo_children():
                 widget.destroy()
-            formularioAfiliacion(ventanaPrincipal)
+            dashboard(ventanaPrincipal, resultadoLogin)
 
         login(ventanaPrincipal, alAutenticar=abrirAplicacion)
         ventanaPrincipal.mainloop()
