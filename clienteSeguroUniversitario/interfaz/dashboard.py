@@ -75,6 +75,7 @@ class dashboard:
             ("Cobertura médica", self.abrirCobertura),
             ("Atenciones médicas", self.abrirAtenciones),
             ("Renovación del seguro", self.abrirRenovacion),
+            ("Justificativos médicos", self.abrirJustificativos),
         ]
         for indice, (texto, comando) in enumerate(opciones):
             fila = indice // 2 + 1
@@ -115,6 +116,13 @@ class dashboard:
         from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
 
         abrirVentanaRenovacion(self.ventanaRaiz, matriculaInicial=self.matricula)
+
+    def abrirJustificativos(self):
+        from clienteSeguroUniversitario.interfaz.listaJustificativosMedicos import (
+            abrirVentanaJustificativos,
+        )
+
+        abrirVentanaJustificativos(self.ventanaRaiz, matricula=self.matricula)
 
     @staticmethod
     def configurarVentanaSecundaria(ventana):
