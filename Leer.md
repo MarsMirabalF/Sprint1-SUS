@@ -8,13 +8,14 @@ cobertura, comprobantes médicos y renovación del seguro universitario.
 ```
 proyecto/
 ├── principal.py                        -> archivo que se ejecuta para correr todo
-├── clienteSeguroUniversitario/         -> interfaz de usuario (Tkinter) — pendiente
+├── clienteSeguroUniversitario/         -> interfaz de usuario (Tkinter)
 ├── servidorSeguroUniversitario/
 │   ├── configuracion/
 │   │   └── configuracionFirebase.py    -> conexión a Firebase Admin SDK
 │   ├── utilidades/
 │   │   └── validadores.py              -> validación de formato (cédula, correo, teléfono)
 │   ├── servicios/
+│   │   ├── servicioLogin.py             -> autenticación por matrícula y Cédula de Identidad
 │   │   ├── servicioAfiliacion.py       -> lógica de la HU 6 (afiliación al seguro)
 │   │   ├── servicioCobertura.py        -> lógica de la HU 1 (consulta de cobertura)
 │   │   ├── servicioComprobante.py      -> lógica de la HU 17 (comprobantes médicos)
@@ -31,6 +32,11 @@ proyecto/
 ├── leer.md
 └── .gitignore
 ```
+
+La aplicación inicia con una pantalla de login. El estudiante debe ingresar la
+matrícula y la Cédula de Identidad registrada en `estudiantes/<matrícula>`.
+Sólo si ambos datos coinciden se habilita el formulario de afiliación y el
+resto de las opciones de la aplicación.
 
 Ejecutar siempre desde la carpeta **raíz** del proyecto (donde está `principal.py`),
 para que los imports (`servidorSeguroUniversitario.xxx`) funcionen.

@@ -3,6 +3,7 @@
 import sys
 
 from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
+from clienteSeguroUniversitario.interfaz.login import login
 
 
 def principal():
@@ -10,7 +11,12 @@ def principal():
         from tkinter import Tk
 
         ventanaPrincipal = Tk()
-        formularioAfiliacion(ventanaPrincipal)
+        def abrirAplicacion(resultadoLogin):
+            for widget in ventanaPrincipal.winfo_children():
+                widget.destroy()
+            formularioAfiliacion(ventanaPrincipal)
+
+        login(ventanaPrincipal, alAutenticar=abrirAplicacion)
         ventanaPrincipal.mainloop()
     except Exception as error:
         print(f"Error inesperado al iniciar la aplicación: {error}", file=sys.stderr)
