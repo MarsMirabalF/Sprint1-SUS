@@ -34,7 +34,7 @@ class servicioLogin:
                 return {
                     "exito": False,
                     "codigo": CODIGO_CAMPOS_INCOMPLETOS,
-                    "mensaje": "Debe ingresar la matrícula y la Cédula de Identidad.",
+                    "mensaje": "Debe ingresar la matrícula y la Cédula de Identidad",
                     "camposFaltantes": camposFaltantes,
                 }
 
@@ -42,7 +42,7 @@ class servicioLogin:
                 return {
                     "exito": False,
                     "codigo": CODIGO_FORMATO_INVALIDO,
-                    "mensaje": "La Cédula de Identidad debe contener entre 6 y 12 dígitos.",
+                    "mensaje": "La Cédula de Identidad debe contener entre 6 y 12 dígitos",
                     "camposInvalidos": ["cedulaIdentidad"],
                 }
 
@@ -51,7 +51,7 @@ class servicioLogin:
                 return {
                     "exito": False,
                     "codigo": CODIGO_CREDENCIALES_INVALIDAS,
-                    "mensaje": "La matrícula o la Cédula de Identidad no son válidas.",
+                    "mensaje": "La matrícula o la Cédula de Identidad no son válidas",
                 }
 
             return {
