@@ -38,7 +38,6 @@ class servicioComprobante:
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
         self.carpetaComprobantes = carpetaComprobantes or CARPETA_COMPROBANTES_POR_DEFECTO
 
-# Consultas internas
     def _obtenerRegistrosPorMatricula(self, referencia, matricula):
         try:
             return referencia.order_by_child("matricula").equal_to(matricula).get() or {}
@@ -53,7 +52,6 @@ class servicioComprobante:
             }
 
     def _obtenerConsultasDelEstudiante(self, matricula):
-        """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
         return self._obtenerRegistrosPorMatricula(self.referenciaConsultasMedicas, matricula)
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
@@ -74,14 +72,13 @@ class servicioComprobante:
             )
         )
 
-# Operaciones públicas
     def habilitarBotonDescarga(self, matricula, fechaReferencia=None):
         try:
             if not matricula or not str(matricula).strip():
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                    "mensaje": "Debe indicar la matrícula del estudiante.",
+                    "mensaje": "Debe indicar la matrícula del estudiante",
                     "habilitado": False,
                 }
 
@@ -92,7 +89,7 @@ class servicioComprobante:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                    "mensaje": "La matrícula ingresada no existe en los registros de la universidad.",
+                    "mensaje": "La matrícula ingresada no existe en los registros de la universidad",
                     "habilitado": False,
                 }
 
@@ -102,14 +99,14 @@ class servicioComprobante:
                 return {
                     "exito": True,
                     "codigo": CODIGO_SIN_CONSULTA_PREVIA,
-                    "mensaje": "El estudiante no registra ninguna consulta médica previa a la fecha actual.",
+                    "mensaje": "El estudiante no registra ninguna consulta médica previa a la fecha actual",
                     "habilitado": False,
                 }
 
             return {
                 "exito": True,
                 "codigo": CODIGO_CONSULTA_PREVIA_ENCONTRADA,
-                "mensaje": "El estudiante registra al menos una consulta médica previa.",
+                "mensaje": "El estudiante registra al menos una consulta médica previa",
                 "habilitado": True,
                 "totalConsultasPrevias": len(consultasPrevias),
             }
@@ -128,7 +125,7 @@ class servicioComprobante:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                    "mensaje": "Debe indicar la matrícula del estudiante.",
+                    "mensaje": "Debe indicar la matrícula del estudiante",
                 }
 
             registros = self._obtenerConsultasDelEstudiante(str(matricula).strip())
@@ -140,7 +137,7 @@ class servicioComprobante:
             return {
                 "exito": True,
                 "codigo": "CONSULTAS_OBTENIDAS",
-                "mensaje": f"Se encontraron {len(listaConsultas)} consultas.",
+                "mensaje": f"Se encontraron {len(listaConsultas)} consultas",
                 "consultas": listaConsultas,
             }
 
@@ -166,7 +163,7 @@ class servicioComprobante:
                     return {
                         "exito": False,
                         "codigo": CODIGO_CONSULTA_NO_VALIDA,
-                        "mensaje": "La consulta seleccionada no existe, no es previa a hoy, o no pertenece a este estudiante.",
+                        "mensaje": "La consulta seleccionada no existe, no es previa a hoy, o no pertenece a este estudiante",
                     }
                 consultaSeleccionada = consultasPrevias[idConsulta]
                 idConsultaSeleccionada = idConsulta
@@ -184,7 +181,7 @@ class servicioComprobante:
             return {
                 "exito": True,
                 "codigo": CODIGO_COMPROBANTE_GENERADO,
-                "mensaje": "El comprobante se generó y se guardó en el perfil del estudiante.",
+                "mensaje": "El comprobante se generó y se guardó en el perfil del estudiante",
                 "rutaArchivo": rutaArchivo,
                 "idConsulta": idConsultaSeleccionada,
                 "nombreCompleto": consultaSeleccionada.get("nombreCompleto", ""),
@@ -206,7 +203,7 @@ class servicioComprobante:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                    "mensaje": "Debe indicar la matrícula del estudiante.",
+                    "mensaje": "Debe indicar la matrícula del estudiante",
                 }
 
             resultados = self._obtenerRegistrosPorMatricula(
@@ -229,7 +226,7 @@ class servicioComprobante:
             return {
                 "exito": True,
                 "codigo": "COMPROBANTES_OBTENIDOS",
-                "mensaje": f"Se encontraron {len(listaComprobantes)} comprobantes guardados.",
+                "mensaje": f"Se encontraron {len(listaComprobantes)} comprobantes guardados",
                 "comprobantes": listaComprobantes,
             }
 
@@ -254,7 +251,7 @@ class servicioComprobante:
                 return {
                     "exito": False,
                     "codigo": CODIGO_COMPROBANTE_NO_ENCONTRADO,
-                    "mensaje": "No existe un comprobante guardado con ese identificador.",
+                    "mensaje": "No existe un comprobante guardado con ese identificador",
                 }
 
             carpetaDestino = carpetaDestino or self.carpetaComprobantes
@@ -270,7 +267,7 @@ class servicioComprobante:
             return {
                 "exito": True,
                 "codigo": CODIGO_COMPROBANTE_GENERADO,
-                "mensaje": "El comprobante guardado se recuperó correctamente.",
+                "mensaje": "El comprobante guardado se recuperó correctamente",
                 "rutaArchivo": rutaArchivo,
                 "nombreCompleto": datos.get("nombreCompleto", ""),
                 "fechaConsulta": datos.get("fechaConsulta", ""),
@@ -283,7 +280,6 @@ class servicioComprobante:
                 "mensaje": f"Ocurrió un error inesperado al recuperar el comprobante: {error}",
             }
 
-# Generación del archivo y guardado en el perfil (DB)
     def _generarArchivoPdf(self, idConsulta, datosConsulta):
         os.makedirs(self.carpetaComprobantes, exist_ok=True)
 
@@ -321,7 +317,7 @@ class servicioComprobante:
 
         pdf.ln(10)
         pdf.set_font("Helvetica", "", 9)
-        pdf.cell(0, 5, "Este comprobante es válido solo si incluye la firma digital autorizada.", ln=True)
+        pdf.cell(0, 5, "Este comprobante es válido solo si incluye la firma digital autorizada", ln=True)
         pdf.ln(6)
 
         if os.path.exists(RUTA_FIRMA_DIGITAL):
