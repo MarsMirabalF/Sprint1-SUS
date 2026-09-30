@@ -40,7 +40,7 @@ class servicioCobertura:
                 return {
                     "exito": True,
                     "codigo": CODIGO_CATALOGO_VACIO,
-                    "mensaje": "Aún no hay servicios médicos cargados en el catálogo.",
+                    "mensaje": "Aún no hay servicios médicos cargados en el catálogo",
                     "servicios": [],
                 }
 
@@ -52,7 +52,7 @@ class servicioCobertura:
             return {
                 "exito": True,
                 "codigo": CODIGO_LISTA_OBTENIDA,
-                "mensaje": f"Se encontraron {len(listaServicios)} servicios médicos.",
+                "mensaje": f"Se encontraron {len(listaServicios)} servicios médicos",
                 "servicios": listaServicios,
             }
 
@@ -69,7 +69,7 @@ class servicioCobertura:
                 return {
                     "exito": False,
                     "codigo": CODIGO_SERVICIO_NO_ESPECIFICADO,
-                    "mensaje": "Debe indicar el servicio médico a consultar.",
+                    "mensaje": "Debe indicar el servicio médico a consultar",
                 }
 
             datos = self.referenciaServiciosMedicos.child(idServicio.strip()).get()
@@ -77,13 +77,13 @@ class servicioCobertura:
                 return {
                     "exito": False,
                     "codigo": CODIGO_SERVICIO_INEXISTENTE,
-                    "mensaje": "El servicio médico seleccionado no existe en el catálogo.",
+                    "mensaje": "El servicio médico seleccionado no existe en el catálogo",
                 }
 
             registro = self._mapearRegistro(idServicio.strip(), datos)
             registro["exito"] = True
             registro["codigo"] = CODIGO_COBERTURA_OBTENIDA
-            registro["mensaje"] = "Estado de cobertura obtenido correctamente."
+            registro["mensaje"] = "Estado de cobertura obtenido correctamente"
             return registro
 
         except Exception as error:
