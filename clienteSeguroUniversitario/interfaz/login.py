@@ -24,6 +24,7 @@ COLOR_PRINCIPAL = "#2C3B2E"
 COLOR_SECUNDARIO = "#6B7C6E"
 COLOR_ACENTO = "#A9BBA0"
 COLOR_ERROR = "#B3541E"
+COLOR_AFILIACION = "#2E7D32"
 
 
 class login:
@@ -52,11 +53,26 @@ class login:
         self.ventanaRaiz.configure(bg=COLOR_FONDO)
         self.ventanaRaiz.minsize(520, 400)
         self.ventanaRaiz.columnconfigure(0, weight=1)
-        self.ventanaRaiz.rowconfigure(0, weight=1)
+        self.ventanaRaiz.rowconfigure(1, weight=1)
 
     def construirInterfaz(self):
+        Button(
+            self.ventanaRaiz,
+            text="Afiliación",
+            command=self.abrirAfiliacion,
+            bg=COLOR_AFILIACION,
+            fg=COLOR_FONDO,
+            activebackground="#1B5E20",
+            activeforeground=COLOR_FONDO,
+            font=("Segoe UI Semibold", 10),
+            bd=0,
+            padx=14,
+            pady=6,
+            cursor="hand2",
+        ).grid(row=0, column=0, sticky="e", padx=24, pady=(16, 0))
+
         marco = Frame(self.ventanaRaiz, bg=COLOR_FONDO, padx=48, pady=48)
-        marco.grid(row=0, column=0)
+        marco.grid(row=1, column=0)
         marco.columnconfigure(1, weight=1)
 
         Label(
@@ -92,52 +108,6 @@ class login:
             cursor="hand2",
         ).grid(row=4, column=0, columnspan=2, pady=(20, 8))
 
-        marcoAfiliacion = Frame(
-            marco,
-            bg=COLOR_ACENTO,
-            padx=18,
-            pady=12,
-        )
-        marcoAfiliacion.grid(
-            row=5,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-            pady=(4, 16),
-        )
-        marcoAfiliacion.columnconfigure(0, weight=1)
-
-        Label(
-            marcoAfiliacion,
-            text="¿Aún no tienes seguro?",
-            bg=COLOR_ACENTO,
-            fg=COLOR_PRINCIPAL,
-            font=("Segoe UI Semibold", 10),
-        ).grid(row=0, column=0, sticky="w")
-
-        Label(
-            marcoAfiliacion,
-            text="Afíliate desde aquí para crear tu registro.",
-            bg=COLOR_ACENTO,
-            fg=COLOR_PRINCIPAL,
-            font=("Segoe UI", 9),
-        ).grid(row=1, column=0, sticky="w", pady=(2, 8))
-
-        Button(
-            marcoAfiliacion,
-            text="Afiliarme ahora",
-            command=self.abrirAfiliacion,
-            bg=COLOR_FONDO,
-            fg=COLOR_PRINCIPAL,
-            activebackground=COLOR_PRINCIPAL,
-            activeforeground=COLOR_FONDO,
-            font=("Segoe UI Semibold", 10),
-            bd=0,
-            padx=14,
-            pady=6,
-            cursor="hand2",
-        ).grid(row=2, column=0, sticky="w")
-
         self.etiquetaEstado = Label(
             marco,
             textvariable=self.variableEstado,
@@ -146,7 +116,7 @@ class login:
             font=("Segoe UI", 10),
             wraplength=380,
         )
-        self.etiquetaEstado.grid(row=6, column=0, columnspan=2)
+        self.etiquetaEstado.grid(row=5, column=0, columnspan=2)
 
     def abrirAfiliacion(self):
         from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
