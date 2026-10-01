@@ -48,12 +48,23 @@ class servicioComprobante:
 
     def _obtenerConsultasDelEstudiante(self, matricula):
         """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
-        resultados = (
-            self.referenciaConsultasMedicas.order_by_child("matricula")
-            .equal_to(matricula)
-            .get()
-        )
-        return resultados or {}
+        try:
+            resultados = (
+                self.referenciaConsultasMedicas.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+            )
+            return resultados or {}
+        except Exception as error:
+            if "Index not defined" not in str(error):
+                raise
+
+            registros = self.referenciaConsultasMedicas.get() or {}
+            return {
+                idConsulta: datos
+                for idConsulta, datos in registros.items()
+                if datos.get("matricula") == matricula
+            }
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
 
