@@ -1,4 +1,5 @@
 import os
+import sys
 
 import firebase_admin
 from firebase_admin import credentials, db
@@ -12,14 +13,20 @@ URL_BASE_DATOS = "https://seguro-universitario-db-default-rtdb.firebaseio.com/"
 URL_NO_CONFIGURADA = "NOMBRE-DEL-PROYECTO"
 
 
+def _carpetaServicio():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+
+    carpetaConfiguracion = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(carpetaConfiguracion)
+
+
 def obtenerRutaCredenciales():
     rutaPersonalizada = os.getenv(VARIABLE_ENTORNO_CREDENCIALES)
     if rutaPersonalizada:
         return rutaPersonalizada
 
-    carpetaConfiguracion = os.path.dirname(os.path.abspath(__file__))
-    carpetaServicio = os.path.dirname(carpetaConfiguracion)
-    return os.path.join(carpetaServicio, "credenciales", NOMBRE_ARCHIVO_CREDENCIALES)
+    return os.path.join(_carpetaServicio(), "credenciales", NOMBRE_ARCHIVO_CREDENCIALES)
 
 
 def obtenerUrlBaseDatos():
@@ -59,6 +66,5 @@ def inicializarFirebase():
 
 
 def obtenerReferencia(nodo):
-    """Devuelve una referencia (db.Reference) a un nodo específico, ej: 'afiliados'."""
     inicializarFirebase()
     return db.reference(nodo)

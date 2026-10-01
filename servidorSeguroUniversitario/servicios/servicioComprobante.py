@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 from datetime import datetime
 
 from fpdf import FPDF
@@ -12,15 +13,21 @@ NODO_COMPROBANTES_MEDICOS = "comprobantesMedicos"
 
 FORMATO_FECHA = "%Y-%m-%d"
 
-CARPETA_COMPROBANTES_POR_DEFECTO = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "comprobantesGenerados",
-)
 
-CARPETA_RECURSOS = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "recursos"
-)
-RUTA_FIRMA_DIGITAL = os.path.join(CARPETA_RECURSOS, "firmaDigital.jpg")
+def _carpetaProyecto():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def _carpetaRecursosEmpaquetados():
+    if getattr(sys, "frozen", False):
+        return os.path.join(sys._MEIPASS, "recursos")
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "recursos")
+
+
+CARPETA_COMPROBANTES_POR_DEFECTO = os.path.join(_carpetaProyecto(), "comprobantesGenerados")
+RUTA_FIRMA_DIGITAL = os.path.join(_carpetaRecursosEmpaquetados(), "firmaDigital.jpg")
 
 CODIGO_MATRICULA_INEXISTENTE = "MATRICULA_INEXISTENTE"
 CODIGO_SIN_CONSULTA_PREVIA = "SIN_CONSULTA_PREVIA"
@@ -32,29 +39,24 @@ CODIGO_ERROR_INESPERADO = "ERROR_INESPERADO"
 
 
 class servicioComprobante:
+
     def __init__(self, carpetaComprobantes=None):
         self.referenciaEstudiantes = obtenerReferencia(NODO_ESTUDIANTES)
         self.referenciaConsultasMedicas = obtenerReferencia(NODO_CONSULTAS_MEDICAS)
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
         self.carpetaComprobantes = carpetaComprobantes or CARPETA_COMPROBANTES_POR_DEFECTO
 
-    def _obtenerRegistrosPorMatricula(self, referencia, matricula):
-        try:
-            return referencia.order_by_child("matricula").equal_to(matricula).get() or {}
-        except Exception as error:
-            if "Index not defined" not in str(error):
-                raise
-            registros = referencia.get() or {}
-            return {
-                idRegistro: datos
-                for idRegistro, datos in registros.items()
-                if datos.get("matricula") == matricula
-            }
-
     def _obtenerConsultasDelEstudiante(self, matricula):
-        return self._obtenerRegistrosPorMatricula(self.referenciaConsultasMedicas, matricula)
+        """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
+        resultados = (
+            self.referenciaConsultasMedicas.order_by_child("matricula")
+            .equal_to(matricula)
+            .get()
+        )
+        return resultados or {}
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):
+
         fechaLimite = fechaReferencia or datetime.now().strftime(FORMATO_FECHA)
         todasLasConsultas = self._obtenerConsultasDelEstudiante(matricula)
 
@@ -71,6 +73,7 @@ class servicioComprobante:
                 reverse=True,
             )
         )
+
 
     def habilitarBotonDescarga(self, matricula, fechaReferencia=None):
         try:
@@ -206,8 +209,11 @@ class servicioComprobante:
                     "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = self._obtenerRegistrosPorMatricula(
-                self.referenciaComprobantesMedicos, matricula
+            resultados = (
+                self.referenciaComprobantesMedicos.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+                or {}
             )
 
             listaComprobantes = [
@@ -322,7 +328,7 @@ class servicioComprobante:
 
         if os.path.exists(RUTA_FIRMA_DIGITAL):
             anchoFirma = 55
-            altoFirma = 25 
+            altoFirma = 25
             yFirma = pdf.get_y()
             pdf.image(RUTA_FIRMA_DIGITAL, x=20, y=yFirma, w=anchoFirma, h=altoFirma)
             pdf.set_y(yFirma + altoFirma + 2)
