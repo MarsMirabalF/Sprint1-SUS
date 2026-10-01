@@ -38,7 +38,6 @@ class servicioComprobante:
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
         self.carpetaComprobantes = carpetaComprobantes or CARPETA_COMPROBANTES_POR_DEFECTO
 
-# Consultas internas
     def _obtenerRegistrosPorMatricula(self, referencia, matricula):
         try:
             return referencia.order_by_child("matricula").equal_to(matricula).get() or {}
@@ -74,7 +73,6 @@ class servicioComprobante:
             )
         )
 
-# Operaciones públicas
     def habilitarBotonDescarga(self, matricula, fechaReferencia=None):
         try:
             if not matricula or not str(matricula).strip():
