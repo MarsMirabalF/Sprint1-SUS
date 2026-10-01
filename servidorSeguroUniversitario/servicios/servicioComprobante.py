@@ -283,7 +283,6 @@ class servicioComprobante:
                 "mensaje": f"Ocurrió un error inesperado al recuperar el comprobante: {error}",
             }
 
-# Generación del archivo y guardado en el perfil (DB)
     def _generarArchivoPdf(self, idConsulta, datosConsulta):
         os.makedirs(self.carpetaComprobantes, exist_ok=True)
 
