@@ -52,7 +52,6 @@ class servicioComprobante:
             }
 
     def _obtenerConsultasDelEstudiante(self, matricula):
-        """Todas las consultas registradas de esa matrícula (sin filtrar por fecha)."""
         return self._obtenerRegistrosPorMatricula(self.referenciaConsultasMedicas, matricula)
 
     def _obtenerConsultasPrevias(self, matricula, fechaReferencia=None):

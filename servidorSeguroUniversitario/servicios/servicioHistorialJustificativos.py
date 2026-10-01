@@ -53,7 +53,6 @@ class servicioHistorialJustificativos:
                 for idConsulta, datos in resultados.items()
             ]
 
-            # Control de ordenamiento: siempre del más reciente al más antiguo.
             historial.sort(key=lambda item: item["fechaConsulta"], reverse=True)
 
             if not historial:
