@@ -1,6 +1,5 @@
 from servidorSeguroUniversitario.configuracion.configuracionFirebase import obtenerReferencia
 
-
 # ----------------------------------------------------------------------
 # Estudiantes
 # ----------------------------------------------------------------------
