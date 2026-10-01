@@ -40,7 +40,6 @@ class servicioRenovacion:
         self.referenciaMatriculaciones = obtenerReferencia(NODO_MATRICULACIONES)
         self.referenciaSeguros = obtenerReferencia(NODO_SEGUROS)
 
-# Consultas internas
     def _obtenerPeriodoVigente(self, fechaHoy):
         periodos = self.referenciaPeriodosAcademicos.get() or {}
         for idPeriodo, datos in periodos.items():
@@ -95,7 +94,6 @@ class servicioRenovacion:
             }
         return matricula, None
 
-# Operaciones públicas
     def consultarEstadoSeguro(self, matricula, fechaReferencia=None):
         try:
             matricula, error = self._validarMatricula(matricula)
@@ -184,7 +182,6 @@ class servicioRenovacion:
                 "fechaRenovacion": fechaRenovacion,
             }
 
-            # Escritura atómica en varios nodos a la vez: o se guarda todo o nada.
             self.referenciaRaiz.update(
                 {
                     f"{NODO_SEGUROS}/{matricula}": nuevoSeguro,
