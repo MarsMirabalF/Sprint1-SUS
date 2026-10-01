@@ -71,7 +71,6 @@ class dashboard:
         ).grid(row=0, column=0, columnspan=2, pady=(0, 24))
 
         opciones = [
-            ("Afiliación", self.abrirAfiliacion),
             ("Cobertura médica", self.abrirCobertura),
             ("Atenciones médicas", self.abrirAtenciones),
             ("Renovación del seguro", self.abrirRenovacion),

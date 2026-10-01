@@ -49,11 +49,22 @@ class servicioRenovacion:
         return None, None
 
     def _obtenerAfiliacionActiva(self, matricula):
-        resultados = (
-            self.referenciaAfiliados.order_by_child("matricula")
-            .equal_to(matricula)
-            .get()
-        )
+        try:
+            resultados = (
+                self.referenciaAfiliados.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+            )
+        except Exception as error:
+            if "Index not defined" not in str(error):
+                raise
+            registros = self.referenciaAfiliados.get() or {}
+            resultados = {
+                idAfiliado: datos
+                for idAfiliado, datos in registros.items()
+                if datos.get("matricula") == matricula
+            }
+
         for registro in (resultados or {}).values():
             if registro.get("estado") == ESTADO_AFILIADO_ACTIVO:
                 return registro
