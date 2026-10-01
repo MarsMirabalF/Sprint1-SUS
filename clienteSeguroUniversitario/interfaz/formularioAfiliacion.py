@@ -243,26 +243,6 @@ class formularioAfiliacion:
         )
         botonAtenciones.grid(row=0, column=3, padx=(8, 0))
 
-        botonRenovacion = Button(
-            marcoBotones,
-            text="Renovar seguro",
-            command=self.abrirRenovacionSeguro,
-            bg=COLOR_FONDO,
-            fg=COLOR_PRINCIPAL,
-            activebackground=COLOR_ACENTO,
-            activeforeground=COLOR_PRINCIPAL,
-            font=("Segoe UI Semibold", 11),
-            bd=0,
-            relief="solid",
-            highlightbackground=COLOR_ACENTO,
-            highlightcolor=COLOR_ACENTO,
-            highlightthickness=1,
-            padx=16,
-            pady=8,
-            cursor="hand2",
-        )
-        botonRenovacion.grid(row=0, column=4, padx=(8, 0))
-
         self.etiquetaEstado = Label(
             marcoPrincipal,
             textvariable=self.estadoMensajeVar,
@@ -297,13 +277,6 @@ class formularioAfiliacion:
         matricula = self.variablesFormulario.get("matricula")
         matriculaInicial = matricula.get().strip() if matricula else ""
         abrirVentanaAtenciones(self.ventanaRaiz, matriculaInicial=matriculaInicial)
-
-    def abrirRenovacionSeguro(self):
-        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
-
-        matricula = self.variablesFormulario.get("matricula")
-        matriculaInicial = matricula.get().strip() if matricula else ""
-        abrirVentanaRenovacion(self.ventanaRaiz, matriculaInicial=matriculaInicial)
 
     def enviarAfiliacion(self):
         try:

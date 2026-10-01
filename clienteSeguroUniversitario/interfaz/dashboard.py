@@ -115,7 +115,11 @@ class dashboard:
     def abrirRenovacion(self):
         from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
 
-        abrirVentanaRenovacion(self.ventanaRaiz, matriculaInicial=self.matricula)
+        abrirVentanaRenovacion(
+            self.ventanaRaiz,
+            matriculaInicial=self.matricula,
+            nombreInicial=self.estudiante.get("nombreCompleto", ""),
+        )
 
     def abrirJustificativos(self):
         from clienteSeguroUniversitario.interfaz.listaJustificativosMedicos import (
