@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Entry, Frame, Label, StringVar
+    from tkinter import Button, Entry, Frame, Label, StringVar, Toplevel
 except ModuleNotFoundError:
     class StringVar:
         def __init__(self, value=""):
@@ -17,7 +17,7 @@ except ModuleNotFoundError:
                 "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
             )
 
-    Button = Entry = Frame = Label = widgetNoDisponible
+    Button = Entry = Frame = Label = Toplevel = widgetNoDisponible
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -90,7 +90,53 @@ class login:
             padx=18,
             pady=8,
             cursor="hand2",
-        ).grid(row=4, column=0, columnspan=2, pady=(20, 12))
+        ).grid(row=4, column=0, columnspan=2, pady=(20, 8))
+
+        marcoAfiliacion = Frame(
+            marco,
+            bg=COLOR_ACENTO,
+            padx=18,
+            pady=12,
+        )
+        marcoAfiliacion.grid(
+            row=5,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=(4, 16),
+        )
+        marcoAfiliacion.columnconfigure(0, weight=1)
+
+        Label(
+            marcoAfiliacion,
+            text="¿Aún no tienes seguro?",
+            bg=COLOR_ACENTO,
+            fg=COLOR_PRINCIPAL,
+            font=("Segoe UI Semibold", 10),
+        ).grid(row=0, column=0, sticky="w")
+
+        Label(
+            marcoAfiliacion,
+            text="Afíliate desde aquí para crear tu registro.",
+            bg=COLOR_ACENTO,
+            fg=COLOR_PRINCIPAL,
+            font=("Segoe UI", 9),
+        ).grid(row=1, column=0, sticky="w", pady=(2, 8))
+
+        Button(
+            marcoAfiliacion,
+            text="Afiliarme ahora",
+            command=self.abrirAfiliacion,
+            bg=COLOR_FONDO,
+            fg=COLOR_PRINCIPAL,
+            activebackground=COLOR_PRINCIPAL,
+            activeforeground=COLOR_FONDO,
+            font=("Segoe UI Semibold", 10),
+            bd=0,
+            padx=14,
+            pady=6,
+            cursor="hand2",
+        ).grid(row=2, column=0, sticky="w")
 
         self.etiquetaEstado = Label(
             marco,
@@ -100,7 +146,14 @@ class login:
             font=("Segoe UI", 10),
             wraplength=380,
         )
-        self.etiquetaEstado.grid(row=5, column=0, columnspan=2)
+        self.etiquetaEstado.grid(row=6, column=0, columnspan=2)
+
+    def abrirAfiliacion(self):
+        from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
+
+        ventana = Toplevel(self.ventanaRaiz)
+        formularioAfiliacion(ventana)
+        ventana.transient(self.ventanaRaiz)
 
     def construirCampo(self, marco, fila, texto, variable):
         Label(

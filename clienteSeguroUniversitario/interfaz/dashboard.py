@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Frame, Label, Toplevel
+    from tkinter import Button, Frame, Label
 except ModuleNotFoundError:
     class widgetNoDisponible:
         def __init__(self, *args, **kwargs):
@@ -7,7 +7,7 @@ except ModuleNotFoundError:
                 "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
             )
 
-    Button = Frame = Label = Toplevel = widgetNoDisponible
+    Button = Frame = Label = widgetNoDisponible
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -71,7 +71,6 @@ class dashboard:
         ).grid(row=0, column=0, columnspan=2, pady=(0, 24))
 
         opciones = [
-            ("Afiliación", self.abrirAfiliacion),
             ("Cobertura médica", self.abrirCobertura),
             ("Atenciones médicas", self.abrirAtenciones),
             ("Renovación del seguro", self.abrirRenovacion),
@@ -94,13 +93,6 @@ class dashboard:
                 pady=14,
                 cursor="hand2",
             ).grid(row=fila, column=columna, sticky="ew", padx=8, pady=8)
-
-    def abrirAfiliacion(self):
-        from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
-
-        ventana = Toplevel(self.ventanaRaiz)
-        formularioAfiliacion(ventana)
-        self.configurarVentanaSecundaria(ventana)
 
     def abrirCobertura(self):
         from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import abrirVentanaCobertura
