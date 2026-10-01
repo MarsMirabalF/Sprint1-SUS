@@ -196,12 +196,13 @@ class pruebasFormularioAfiliacion(unittest.TestCase):
         )
 
         seccion = seccionRenovacionSeguro.__new__(seccionRenovacionSeguro)
-        seccion.variableMatricula = variableSimulada("20231002")
+        seccion.matriculaInicial = "20231002"
         seccion.variableEstado = variableSimulada("")
         seccion.variableInicio = variableSimulada("")
         seccion.variableFin = variableSimulada("")
         seccion.variableUltimaRenovacion = variableSimulada("")
         seccion.etiquetaEstado = Mock()
+        seccion.botonRenovar = Mock()
         seccion.fabricaServicio = Mock(
             return_value=Mock(
                 consultarEstadoSeguro=Mock(

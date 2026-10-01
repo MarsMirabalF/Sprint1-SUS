@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Frame, Label
+    from tkinter import Button, Frame, Label, Toplevel
 except ModuleNotFoundError:
     class widgetNoDisponible:
         def __init__(self, *args, **kwargs):
@@ -7,7 +7,7 @@ except ModuleNotFoundError:
                 "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
             )
 
-    Button = Frame = Label = widgetNoDisponible
+    Button = Frame = Label = Toplevel = widgetNoDisponible
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -71,6 +71,7 @@ class dashboard:
         ).grid(row=0, column=0, columnspan=2, pady=(0, 24))
 
         opciones = [
+            ("Afiliación", self.abrirAfiliacion),
             ("Cobertura médica", self.abrirCobertura),
             ("Atenciones médicas", self.abrirAtenciones),
             ("Renovación del seguro", self.abrirRenovacion),
@@ -94,6 +95,13 @@ class dashboard:
                 cursor="hand2",
             ).grid(row=fila, column=columna, sticky="ew", padx=8, pady=8)
 
+    def abrirAfiliacion(self):
+        from clienteSeguroUniversitario.interfaz.formularioAfiliacion import formularioAfiliacion
+
+        ventana = Toplevel(self.ventanaRaiz)
+        formularioAfiliacion(ventana)
+        self.configurarVentanaSecundaria(ventana)
+
     def abrirCobertura(self):
         from clienteSeguroUniversitario.interfaz.seccionCoberturaMedica import abrirVentanaCobertura
 
@@ -111,7 +119,11 @@ class dashboard:
     def abrirRenovacion(self):
         from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
 
-        abrirVentanaRenovacion(self.ventanaRaiz, matriculaInicial=self.matricula)
+        abrirVentanaRenovacion(
+            self.ventanaRaiz,
+            matriculaInicial=self.matricula,
+            nombreInicial=self.estudiante.get("nombreCompleto", ""),
+        )
 
     def abrirJustificativos(self):
         from clienteSeguroUniversitario.interfaz.listaJustificativosMedicos import (

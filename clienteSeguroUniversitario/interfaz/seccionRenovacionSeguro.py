@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Entry, Frame, Label, StringVar, Toplevel
+    from tkinter import Button, Frame, Label, StringVar, Toplevel, messagebox
 except ModuleNotFoundError:
     class widgetNoDisponible:
         def __init__(self, *args, **kwargs):
@@ -7,8 +7,15 @@ except ModuleNotFoundError:
                 "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
             )
 
-    Button = Entry = Frame = Label = Toplevel = widgetNoDisponible
+    Button = Frame = Label = Toplevel = widgetNoDisponible
     StringVar = widgetNoDisponible
+
+    class messagebox:
+        @staticmethod
+        def askyesno(*args, **kwargs):
+            raise ModuleNotFoundError("Tkinter no está disponible en este entorno.")
+
+        showinfo = showwarning = showerror = askyesno
 
 COLOR_FONDO = "#F7F3E9"
 COLOR_PRINCIPAL = "#2C3B2E"
@@ -22,22 +29,22 @@ ESTADO_VENCIDO = "Vencido"
 
 class seccionRenovacionSeguro:
 
-    def __init__(self, ventanaRaiz, matriculaInicial="", fabricaServicio=None):
+    def __init__(self, ventanaRaiz, matriculaInicial="", nombreInicial="", fabricaServicio=None):
         self.ventanaRaiz = ventanaRaiz
         self.matriculaInicial = matriculaInicial
+        self.nombreInicial = nombreInicial
         self.fabricaServicio = fabricaServicio or self.crearServicioRenovacion
         self.servicio = None
-        self.variableMatricula = StringVar(value=matriculaInicial)
-        self.variableEstado = StringVar(value="Ingrese una matrícula para consultar el seguro.")
+        self.variableEstado = StringVar(value="Consultando vigencia del seguro...")
         self.variableInicio = StringVar(value="-")
         self.variableFin = StringVar(value="-")
         self.variableUltimaRenovacion = StringVar(value="-")
+        self.botonRenovar = None
 
         self.configurarVentana()
         self.construirInterfaz()
 
-        if matriculaInicial.strip():
-            self.consultarEstadoSeguro()
+        self.consultarEstadoSeguro()
 
     @staticmethod
     def crearServicioRenovacion():
@@ -96,46 +103,41 @@ class seccionRenovacionSeguro:
             font=("Segoe UI", 11),
         ).grid(row=1, column=0, sticky="w", pady=(0, 24))
 
-        marcoBusqueda = Frame(marcoPrincipal, bg=COLOR_FONDO)
-        marcoBusqueda.grid(row=2, column=0, sticky="ew", pady=(0, 24))
-        marcoBusqueda.columnconfigure(1, weight=1)
+        marcoPerfil = Frame(marcoPrincipal, bg=COLOR_FONDO)
+        marcoPerfil.grid(row=2, column=0, sticky="ew", pady=(0, 24))
+        marcoPerfil.columnconfigure(1, weight=1)
 
         Label(
-            marcoBusqueda,
+            marcoPerfil,
             text="Matrícula",
             bg=COLOR_FONDO,
             fg=COLOR_PRINCIPAL,
+            font=("Segoe UI Semibold", 11),
+        ).grid(row=0, column=0, sticky="w", padx=(0, 24), pady=8)
+        Label(
+            marcoPerfil,
+            text=self.matriculaInicial or "-",
+            bg=COLOR_FONDO,
+            fg=COLOR_SECUNDARIO,
             font=("Segoe UI", 11),
-        ).grid(row=0, column=0, sticky="w", padx=(0, 16))
+            anchor="w",
+        ).grid(row=0, column=1, sticky="w", pady=8)
 
-        Entry(
-            marcoBusqueda,
-            textvariable=self.variableMatricula,
+        Label(
+            marcoPerfil,
+            text="Nombre",
             bg=COLOR_FONDO,
             fg=COLOR_PRINCIPAL,
-            font=("Segoe UI", 11),
-            relief="solid",
-            bd=0,
-            highlightbackground=COLOR_ACENTO,
-            highlightcolor=COLOR_ACENTO,
-            highlightthickness=1,
-            insertbackground=COLOR_PRINCIPAL,
-        ).grid(row=0, column=1, sticky="ew", ipady=4)
-
-        Button(
-            marcoBusqueda,
-            text="Consultar",
-            command=self.consultarEstadoSeguro,
-            bg=COLOR_PRINCIPAL,
-            fg=COLOR_FONDO,
-            activebackground=COLOR_SECUNDARIO,
-            activeforeground=COLOR_FONDO,
             font=("Segoe UI Semibold", 11),
-            bd=0,
-            padx=16,
-            pady=8,
-            cursor="hand2",
-        ).grid(row=0, column=2, padx=(16, 0))
+        ).grid(row=1, column=0, sticky="w", padx=(0, 24), pady=8)
+        Label(
+            marcoPerfil,
+            text=self.nombreInicial or "-",
+            bg=COLOR_FONDO,
+            fg=COLOR_SECUNDARIO,
+            font=("Segoe UI", 11),
+            anchor="w",
+        ).grid(row=1, column=1, sticky="w", pady=8)
 
         marcoEstado = Frame(
             marcoPrincipal,
@@ -190,16 +192,35 @@ class seccionRenovacionSeguro:
                 anchor="w",
             ).grid(row=indice, column=1, sticky="ew", pady=8)
 
+        self.botonRenovar = Button(
+            marcoPrincipal,
+            text="Renovar seguro",
+            command=self.confirmarRenovacion,
+            state="disabled",
+            bg=COLOR_PRINCIPAL,
+            fg=COLOR_FONDO,
+            activebackground=COLOR_SECUNDARIO,
+            activeforeground=COLOR_FONDO,
+            disabledforeground=COLOR_SECUNDARIO,
+            font=("Segoe UI Semibold", 11),
+            bd=0,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        )
+        self.botonRenovar.grid(row=4, column=0, sticky="w", pady=(16, 0))
+
     def obtenerServicioRenovacion(self):
         if self.servicio is None:
             self.servicio = self.fabricaServicio()
         return self.servicio
 
     def consultarEstadoSeguro(self):
-        matricula = self.variableMatricula.get().strip()
+        matricula = self.matriculaInicial.strip()
         if not matricula:
-            self.variableEstado.set("Debe ingresar una matrícula para consultar el seguro.")
+            self.variableEstado.set("No se encontró una matrícula asociada a la sesión.")
             self.etiquetaEstado.configure(fg=COLOR_ERROR)
+            self.botonRenovar.configure(state="disabled")
             return
 
         try:
@@ -214,6 +235,7 @@ class seccionRenovacionSeguro:
             self.variableEstado.set(resultado.get("mensaje", "No fue posible consultar el seguro."))
             self.etiquetaEstado.configure(fg=COLOR_ERROR)
             self.limpiarFechas()
+            self.botonRenovar.configure(state="disabled")
             return
 
         self.variableEstado.set(resultado.get("estadoVigencia", "Sin vigencia registrada"))
@@ -228,6 +250,43 @@ class seccionRenovacionSeguro:
             else COLOR_SECUNDARIO
         )
         self.etiquetaEstado.configure(fg=colorEstado)
+        self.botonRenovar.configure(state="normal")
+
+    def confirmarRenovacion(self):
+        if not self.matriculaInicial.strip():
+            return
+
+        confirmar = messagebox.askyesno(
+            "Confirmar renovación",
+            "¿Desea renovar el seguro del estudiante para el periodo vigente?",
+            parent=self.ventanaRaiz,
+        )
+        if not confirmar:
+            return
+
+        try:
+            resultado = self.obtenerServicioRenovacion().renovarSeguro(self.matriculaInicial)
+        except Exception as error:
+            resultado = {
+                "exito": False,
+                "mensaje": f"Ocurrió un error inesperado al renovar el seguro: {error}",
+            }
+
+        if resultado.get("exito"):
+            self.actualizarVigencia(resultado)
+            messagebox.showinfo("Renovación exitosa", resultado.get("mensaje"), parent=self.ventanaRaiz)
+        else:
+            mensaje = resultado.get("mensaje", "No fue posible renovar el seguro.")
+            self.variableEstado.set(mensaje)
+            self.etiquetaEstado.configure(fg=COLOR_ERROR)
+            messagebox.showwarning("Renovación no disponible", mensaje, parent=self.ventanaRaiz)
+
+    def actualizarVigencia(self, resultado):
+        self.variableEstado.set(resultado.get("estadoVigencia", ESTADO_VIGENTE))
+        self.variableInicio.set(resultado.get("fechaInicioVigencia") or "-")
+        self.variableFin.set(resultado.get("fechaFinVigencia") or "-")
+        self.variableUltimaRenovacion.set(resultado.get("fechaRenovacion") or "-")
+        self.etiquetaEstado.configure(fg=COLOR_PRINCIPAL)
 
     def limpiarFechas(self):
         self.variableInicio.set("-")
@@ -235,11 +294,14 @@ class seccionRenovacionSeguro:
         self.variableUltimaRenovacion.set("-")
 
 
-def abrirVentanaRenovacion(ventanaPadre, matriculaInicial="", fabricaServicio=None):
+def abrirVentanaRenovacion(
+    ventanaPadre, matriculaInicial="", nombreInicial="", fabricaServicio=None
+):
     ventanaRenovacion = Toplevel(ventanaPadre)
     seccionRenovacionSeguro(
         ventanaRenovacion,
         matriculaInicial=matriculaInicial,
+        nombreInicial=nombreInicial,
         fabricaServicio=fabricaServicio,
     )
     ventanaRenovacion.transient(ventanaPadre)
