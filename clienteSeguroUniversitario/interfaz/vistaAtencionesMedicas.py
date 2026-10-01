@@ -1,5 +1,5 @@
 try:
-    from tkinter import Button, Entry, Frame, Label, StringVar, Toplevel, messagebox
+    from tkinter import Button, Frame, Label, StringVar, Toplevel, messagebox
     from tkinter import ttk
 except ModuleNotFoundError:
     class widgetNoDisponible:
@@ -8,7 +8,7 @@ except ModuleNotFoundError:
                 "Tkinter no está disponible en este entorno. Instale Tk para usar la interfaz gráfica."
             )
 
-    Button = Entry = Frame = Label = Toplevel = widgetNoDisponible
+    Button = Frame = Label = Toplevel = widgetNoDisponible
     StringVar = widgetNoDisponible
     ttk = None
 
@@ -24,17 +24,17 @@ COLOR_ERROR = "#B3541E"
 
 class vistaAtencionesMedicas:
 
-    def __init__(self, ventanaRaiz, matriculaInicial="", fabricaServicio=None):
+    def __init__(self, ventanaRaiz, matriculaInicial="", nombreInicial="", fabricaServicio=None):
         self.ventanaRaiz = ventanaRaiz
         self.matriculaInicial = matriculaInicial
+        self.nombreInicial = nombreInicial
         self.fabricaServicio = fabricaServicio or self.crearServicioComprobante
         self.servicio = None
         self.consultas = []
         self.consultaSeleccionada = None
         self.descargaHabilitada = False
         self.botonDescargar = None
-        self.variableMatricula = StringVar(value=matriculaInicial)
-        self.variableEstado = StringVar(value="Ingrese una matrícula para consultar las atenciones.")
+        self.variableEstado = StringVar(value="Consultando atenciones médicas...")
 
         self.configurarVentana()
         self.construirInterfaz()
@@ -92,46 +92,41 @@ class vistaAtencionesMedicas:
             font=("Cambria", 20),
         ).grid(row=0, column=0, sticky="w", pady=(0, 16))
 
-        marcoBusqueda = Frame(marcoPrincipal, bg=COLOR_FONDO)
-        marcoBusqueda.grid(row=1, column=0, sticky="ew", pady=(0, 16))
-        marcoBusqueda.columnconfigure(1, weight=1)
+        marcoPerfil = Frame(marcoPrincipal, bg=COLOR_FONDO)
+        marcoPerfil.grid(row=1, column=0, sticky="ew", pady=(0, 16))
+        marcoPerfil.columnconfigure(1, weight=1)
 
         Label(
-            marcoBusqueda,
+            marcoPerfil,
             text="Matrícula",
             bg=COLOR_FONDO,
             fg=COLOR_PRINCIPAL,
+            font=("Segoe UI Semibold", 11),
+        ).grid(row=0, column=0, sticky="w", padx=(0, 24), pady=8)
+        Label(
+            marcoPerfil,
+            text=self.matriculaInicial or "-",
+            bg=COLOR_FONDO,
+            fg=COLOR_SECUNDARIO,
             font=("Segoe UI", 11),
-        ).grid(row=0, column=0, sticky="w", padx=(0, 16))
+            anchor="w",
+        ).grid(row=0, column=1, sticky="w", pady=8)
 
-        Entry(
-            marcoBusqueda,
-            textvariable=self.variableMatricula,
+        Label(
+            marcoPerfil,
+            text="Nombre",
             bg=COLOR_FONDO,
             fg=COLOR_PRINCIPAL,
-            font=("Segoe UI", 11),
-            relief="solid",
-            bd=0,
-            highlightbackground=COLOR_ACENTO,
-            highlightcolor=COLOR_ACENTO,
-            highlightthickness=1,
-            insertbackground=COLOR_PRINCIPAL,
-        ).grid(row=0, column=1, sticky="ew", ipady=4)
-
-        Button(
-            marcoBusqueda,
-            text="Consultar",
-            command=self.cargarAtenciones,
-            bg=COLOR_PRINCIPAL,
-            fg=COLOR_FONDO,
-            activebackground=COLOR_SECUNDARIO,
-            activeforeground=COLOR_FONDO,
             font=("Segoe UI Semibold", 11),
-            bd=0,
-            padx=16,
-            pady=8,
-            cursor="hand2",
-        ).grid(row=0, column=2, padx=(16, 0))
+        ).grid(row=1, column=0, sticky="w", padx=(0, 24), pady=8)
+        Label(
+            marcoPerfil,
+            text=self.nombreInicial or "-",
+            bg=COLOR_FONDO,
+            fg=COLOR_SECUNDARIO,
+            font=("Segoe UI", 11),
+            anchor="w",
+        ).grid(row=1, column=1, sticky="w", pady=8)
 
         marcoTabla = Frame(marcoPrincipal, bg=COLOR_FONDO)
         marcoTabla.grid(row=2, column=0, sticky="nsew")
@@ -209,11 +204,11 @@ class vistaAtencionesMedicas:
         self.botonDescargar.configure(state="disabled")
 
     def cargarAtenciones(self):
-        matricula = self.variableMatricula.get().strip()
+        matricula = self.matriculaInicial.strip()
         self.limpiarTabla()
 
         if not matricula:
-            self.variableEstado.set("Debe ingresar una matrícula para consultar las atenciones.")
+            self.variableEstado.set("No se encontró una matrícula asociada a la sesión.")
             self.etiquetaEstado.configure(fg=COLOR_ERROR)
             return
 
@@ -267,7 +262,7 @@ class vistaAtencionesMedicas:
             self.botonDescargar.configure(state="disabled")
             return
 
-        matricula = self.variableMatricula.get().strip()
+        matricula = self.matriculaInicial.strip()
         resultado = self.obtenerServicioComprobante().generarComprobante(
             matricula, self.consultaSeleccionada
         )
@@ -286,11 +281,14 @@ class vistaAtencionesMedicas:
             )
 
 
-def abrirVentanaAtenciones(ventanaPadre, matriculaInicial="", fabricaServicio=None):
+def abrirVentanaAtenciones(
+    ventanaPadre, matriculaInicial="", nombreInicial="", fabricaServicio=None
+):
     ventanaAtenciones = Toplevel(ventanaPadre)
     vistaAtencionesMedicas(
         ventanaAtenciones,
         matriculaInicial=matriculaInicial,
+        nombreInicial=nombreInicial,
         fabricaServicio=fabricaServicio,
     )
     ventanaAtenciones.transient(ventanaPadre)

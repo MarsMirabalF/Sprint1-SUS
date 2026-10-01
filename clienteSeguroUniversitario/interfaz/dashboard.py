@@ -110,16 +110,16 @@ class dashboard:
     def abrirAtenciones(self):
         from clienteSeguroUniversitario.interfaz.vistaAtencionesMedicas import abrirVentanaAtenciones
 
-        abrirVentanaAtenciones(self.ventanaRaiz, matriculaInicial=self.matricula)
-
-    def abrirRenovacion(self):
-        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
-
-        abrirVentanaRenovacion(
+        abrirVentanaAtenciones(
             self.ventanaRaiz,
             matriculaInicial=self.matricula,
             nombreInicial=self.estudiante.get("nombreCompleto", ""),
         )
+
+    def abrirRenovacion(self):
+        from clienteSeguroUniversitario.interfaz.seccionRenovacionSeguro import abrirVentanaRenovacion
+
+        abrirVentanaRenovacion(self.ventanaRaiz, matriculaInicial=self.matricula)
 
     def abrirJustificativos(self):
         from clienteSeguroUniversitario.interfaz.listaJustificativosMedicos import (

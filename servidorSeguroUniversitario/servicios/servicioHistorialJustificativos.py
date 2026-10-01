@@ -11,24 +11,6 @@ class servicioHistorialJustificativos:
     def __init__(self):
         self.referenciaComprobantesMedicos = obtenerReferencia(NODO_COMPROBANTES_MEDICOS)
 
-    def _obtenerComprobantesPorMatricula(self, matricula):
-        try:
-            return (
-                self.referenciaComprobantesMedicos.order_by_child("matricula")
-                .equal_to(matricula)
-                .get()
-                or {}
-            )
-        except Exception as error:
-            if "Index not defined" not in str(error):
-                raise
-            registros = self.referenciaComprobantesMedicos.get() or {}
-            return {
-                idComprobante: datos
-                for idComprobante, datos in registros.items()
-                if datos.get("matricula") == matricula
-            }
-
     def obtenerHistorial(self, matricula):
         try:
             matricula = str(matricula).strip() if matricula else ""
@@ -36,10 +18,15 @@ class servicioHistorialJustificativos:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_NO_ESPECIFICADA,
-                    "mensaje": "Debe indicar la matrícula del estudiante",
+                    "mensaje": "Debe indicar la matrícula del estudiante.",
                 }
 
-            resultados = self._obtenerComprobantesPorMatricula(matricula)
+            resultados = (
+                self.referenciaComprobantesMedicos.order_by_child("matricula")
+                .equal_to(matricula)
+                .get()
+                or {}
+            )
 
             historial = [
                 {
@@ -60,14 +47,14 @@ class servicioHistorialJustificativos:
                 return {
                     "exito": True,
                     "codigo": CODIGO_SIN_JUSTIFICATIVOS,
-                    "mensaje": "El estudiante todavía no generó ningún justificativo médico",
+                    "mensaje": "El estudiante todavía no generó ningún justificativo médico.",
                     "justificativos": [],
                 }
 
             return {
                 "exito": True,
                 "codigo": CODIGO_HISTORIAL_OBTENIDO,
-                "mensaje": f"Se encontraron {len(historial)} justificativos",
+                "mensaje": f"Se encontraron {len(historial)} justificativos.",
                 "justificativos": historial,
             }
 
