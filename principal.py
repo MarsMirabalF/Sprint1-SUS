@@ -1,5 +1,3 @@
-"""Punto de entrada de la aplicación."""
-
 import sys
 
 from clienteSeguroUniversitario.interfaz.dashboard import dashboard
