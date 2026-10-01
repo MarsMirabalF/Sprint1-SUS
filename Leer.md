@@ -196,6 +196,11 @@ Sin cambios de esquema: reutiliza `comprobantesMedicos` (HU 17). Nuevo:
 | HISTORIAL_OBTENIDO            | True  | Lista devuelta, ordenada de más reciente a más antiguo |
 | ERROR_INESPERADO              | False | Excepción no controlada                              |
 
+En la lista de justificativos, las cabeceras de las columnas funcionan como
+controles de ordenamiento. La primera pulsación ordena ascendentemente por la
+columna seleccionada y una segunda pulsación invierte el orden. La vista se
+abre ordenada por fecha de atención, desde la más reciente hasta la más antigua.
+
 ## Pendiente
 
 - `clienteSeguroUniversitario/`: interfaz Tkinter para HU 6 (formulario,

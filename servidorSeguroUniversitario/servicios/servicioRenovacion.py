@@ -91,7 +91,7 @@ class servicioRenovacion:
             return None, {
                 "exito": False,
                 "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                "mensaje": "La matrícula ingresada no existe en los registros de la universidad.",
+                "mensaje": "La matrícula ingresada no existe en los registros de la universidad",
             }
         return matricula, None
 
@@ -137,7 +137,7 @@ class servicioRenovacion:
                 return {
                     "exito": False,
                     "codigo": CODIGO_SIN_AFILIACION_ACTIVA,
-                    "mensaje": "El estudiante no tiene una afiliación activa al seguro; debe afiliarse primero.",
+                    "mensaje": "El estudiante no tiene una afiliación activa al seguro; debe afiliarse primero",
                 }
 
             idPeriodo, periodo = self._obtenerPeriodoVigente(fechaHoy)
@@ -145,14 +145,14 @@ class servicioRenovacion:
                 return {
                     "exito": False,
                     "codigo": CODIGO_PERIODO_NO_VIGENTE,
-                    "mensaje": "No hay un periodo académico vigente en este momento; no se puede renovar.",
+                    "mensaje": "No hay un periodo académico vigente en este momento; no se puede renovar",
                 }
 
             if not self._estaMatriculado(matricula, idPeriodo):
                 return {
                     "exito": False,
                     "codigo": CODIGO_NO_MATRICULADO_EN_PERIODO,
-                    "mensaje": f"El estudiante no figura como matriculado en el periodo vigente ({idPeriodo}); la renovación fue rechazada.",
+                    "mensaje": f"El estudiante no figura como matriculado en el periodo vigente ({idPeriodo}); la renovación fue rechazada",
                     "idPeriodo": idPeriodo,
                 }
 
@@ -196,7 +196,7 @@ class servicioRenovacion:
             return {
                 "exito": True,
                 "codigo": CODIGO_RENOVACION_EXITOSA,
-                "mensaje": "La renovación del seguro se realizó con éxito.",
+                "mensaje": "La renovación del seguro se realizó con éxito",
                 "matricula": matricula,
                 "nombreCompleto": afiliacion.get("nombreCompleto", ""),
                 "idPeriodo": idPeriodo,

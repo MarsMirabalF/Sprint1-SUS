@@ -36,7 +36,7 @@ class servicioHistorialJustificativos:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_NO_ESPECIFICADA,
-                    "mensaje": "Debe indicar la matrícula del estudiante.",
+                    "mensaje": "Debe indicar la matrícula del estudiante",
                 }
 
             resultados = self._obtenerComprobantesPorMatricula(matricula)
@@ -60,14 +60,14 @@ class servicioHistorialJustificativos:
                 return {
                     "exito": True,
                     "codigo": CODIGO_SIN_JUSTIFICATIVOS,
-                    "mensaje": "El estudiante todavía no generó ningún justificativo médico.",
+                    "mensaje": "El estudiante todavía no generó ningún justificativo médico",
                     "justificativos": [],
                 }
 
             return {
                 "exito": True,
                 "codigo": CODIGO_HISTORIAL_OBTENIDO,
-                "mensaje": f"Se encontraron {len(historial)} justificativos.",
+                "mensaje": f"Se encontraron {len(historial)} justificativos",
                 "justificativos": historial,
             }
 

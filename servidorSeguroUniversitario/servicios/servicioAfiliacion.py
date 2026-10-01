@@ -79,7 +79,7 @@ class servicioAfiliacion:
                 return {
                     "exito": False,
                     "codigo": CODIGO_CAMPOS_INCOMPLETOS,
-                    "mensaje": "Debe completar todos los campos obligatorios.",
+                    "mensaje": "Debe completar todos los campos obligatorios",
                     "camposFaltantes": camposFaltantes,
                 }
 
@@ -88,7 +88,7 @@ class servicioAfiliacion:
                 return {
                     "exito": False,
                     "codigo": CODIGO_FORMATO_INVALIDO,
-                    "mensaje": "Uno o más campos tienen un formato inválido.",
+                    "mensaje": "Uno o más campos tienen un formato inválido",
                     "camposInvalidos": camposInvalidos,
                 }
 
@@ -100,21 +100,21 @@ class servicioAfiliacion:
                 return {
                     "exito": False,
                     "codigo": CODIGO_MATRICULA_INEXISTENTE,
-                    "mensaje": "La matrícula ingresada no existe en los registros de la universidad.",
+                    "mensaje": "La matrícula ingresada no existe en los registros de la universidad",
                 }
 
             if estudiante.get("tieneSeguroActivo") is True:
                 return {
                     "exito": False,
                     "codigo": CODIGO_SEGURO_YA_ACTIVO,
-                    "mensaje": "El estudiante ya posee un seguro activo según los registros de la universidad.",
+                    "mensaje": "El estudiante ya posee un seguro activo según los registros de la universidad",
                 }
 
             if self.existeSeguroActivoPorCedula(cedulaIdentidad):
                 return {
                     "exito": False,
                     "codigo": CODIGO_SEGURO_YA_ACTIVO,
-                    "mensaje": "Ya existe una afiliación activa registrada con esta Cédula de Identidad.",
+                    "mensaje": "Ya existe una afiliación activa registrada con esta Cédula de Identidad",
                 }
 
             nuevoRegistro = {
@@ -136,7 +136,7 @@ class servicioAfiliacion:
             return {
                 "exito": True,
                 "codigo": CODIGO_AFILIACION_EXITOSA,
-                "mensaje": "La afiliación se realizó con éxito.",
+                "mensaje": "La afiliación se realizó con éxito",
                 "idAfiliado": referenciaNuevoAfiliado.key,
             }
 
