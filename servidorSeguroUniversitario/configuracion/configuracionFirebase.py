@@ -26,6 +26,11 @@ def obtenerRutaCredenciales():
     if rutaPersonalizada:
         return rutaPersonalizada
 
+    if getattr(sys, "frozen", False):
+        rutaEmpaquetada = os.path.join(sys._MEIPASS, "credenciales", NOMBRE_ARCHIVO_CREDENCIALES)
+        if os.path.exists(rutaEmpaquetada):
+            return rutaEmpaquetada
+
     return os.path.join(_carpetaServicio(), "credenciales", NOMBRE_ARCHIVO_CREDENCIALES)
 
 
