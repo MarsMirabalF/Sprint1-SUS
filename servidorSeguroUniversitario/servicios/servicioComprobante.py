@@ -360,6 +360,9 @@ class servicioComprobante:
         with open(rutaArchivo, "wb") as archivoPdf:
             archivoPdf.write(contenidoPdf)
 
+        if not os.path.isfile(rutaArchivo) or os.path.getsize(rutaArchivo) == 0:
+            raise IOError(f"No se pudo verificar el archivo generado: {rutaArchivo}")
+
         return nombreArchivo, rutaArchivo, contenidoPdf
 
     def _guardarComprobanteEnPerfil(self, idConsulta, datosConsulta, nombreArchivo, contenidoPdf):

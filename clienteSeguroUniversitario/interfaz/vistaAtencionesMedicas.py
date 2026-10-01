@@ -1,3 +1,5 @@
+import os
+
 try:
     from tkinter import Button, Frame, Label, StringVar, Toplevel, messagebox
     from tkinter import ttk
@@ -214,10 +216,8 @@ class vistaAtencionesMedicas:
 
         try:
             resultado = self.obtenerServicioComprobante().obtenerConsultasDelEstudiante(matricula)
-            resultadoDescarga = self.obtenerServicioComprobante().habilitarBotonDescarga(matricula)
         except Exception as error:
             resultado = {"exito": False, "mensaje": f"Ocurrió un error inesperado: {error}"}
-            resultadoDescarga = {"habilitado": False}
 
         if not resultado.get("exito"):
             self.variableEstado.set(resultado.get("mensaje", "No fue posible obtener las atenciones."))
@@ -225,7 +225,7 @@ class vistaAtencionesMedicas:
             return
 
         self.consultas = resultado.get("consultas", [])
-        self.descargaHabilitada = resultadoDescarga.get("habilitado", False) is True
+        self.descargaHabilitada = bool(self.consultas)
         for consulta in self.consultas:
             self.tablaAtenciones.insert(
                 "",
@@ -242,7 +242,7 @@ class vistaAtencionesMedicas:
 
         self.variableEstado.set(resultado.get("mensaje", "Atenciones consultadas."))
         self.etiquetaEstado.configure(fg=COLOR_SECUNDARIO)
-        if resultadoDescarga.get("habilitado"):
+        if self.descargaHabilitada:
             self.variableEstado.set(
                 f"{resultado.get('mensaje', 'Atenciones consultadas.')} "
                 "Seleccione una atención para descargar su comprobante."
@@ -268,11 +268,20 @@ class vistaAtencionesMedicas:
         )
 
         if resultado.get("exito"):
+            rutaArchivo = resultado.get("rutaArchivo", "")
             messagebox.showinfo(
                 "Comprobante generado",
-                f"El comprobante se guardó correctamente en:\n{resultado.get('rutaArchivo', '')}",
+                f"El comprobante se guardó correctamente en:\n{rutaArchivo}",
                 parent=self.ventanaRaiz,
             )
+            if rutaArchivo and os.path.isfile(rutaArchivo):
+                try:
+                    os.startfile(rutaArchivo)
+                except OSError:
+                    self.variableEstado.set(
+                        "El comprobante fue guardado, pero no se pudo abrir automáticamente. "
+                        f"Puede abrirlo desde:\n{rutaArchivo}"
+                    )
         else:
             messagebox.showwarning(
                 "Descarga no disponible",
