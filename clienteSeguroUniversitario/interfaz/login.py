@@ -60,7 +60,7 @@ class login:
             self.ventanaRaiz,
             text="Afiliación",
             command=self.abrirAfiliacion,
-            bg=COLOR_AFILIACION,
+            bg=COLOR_PRINCIPAL,
             fg=COLOR_FONDO,
             activebackground="#1B5E20",
             activeforeground=COLOR_FONDO,
