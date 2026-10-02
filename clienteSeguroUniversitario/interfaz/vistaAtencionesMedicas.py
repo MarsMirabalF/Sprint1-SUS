@@ -277,7 +277,7 @@ class vistaAtencionesMedicas:
             if rutaArchivo and os.path.isfile(rutaArchivo):
                 try:
                     os.startfile(rutaArchivo)
-                except OSError:
+                except (OSError, AttributeError):
                     self.variableEstado.set(
                         "El comprobante fue guardado, pero no se pudo abrir automáticamente. "
                         f"Puede abrirlo desde:\n{rutaArchivo}"
